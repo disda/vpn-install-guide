@@ -1,4 +1,4 @@
-export const MAX_TEXT_BYTES = 48 * 1024;
+export const MAX_TEXT_BYTES = 128 * 1024;
 export const SHARE_LIFETIME_MS = 24 * 60 * 60 * 1000;
 export type TextFormat = "text" | "json";
 export type TextShare = {
@@ -23,7 +23,7 @@ export function validateText(text: string, format: TextFormat): TextValidation {
     return {
       ok: false,
       code: "too_large",
-      error: "文本超过 48 KB，请缩短后重试。",
+      error: "文本超过 128 KB，请缩短后重试。",
     };
   }
   if (format === "json") {

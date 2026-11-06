@@ -1,4 +1,5 @@
 import {
+  MAX_TEXT_BYTES,
   SHARE_LIFETIME_MS,
   isShareId,
   validateText,
@@ -36,7 +37,8 @@ export function sameOrigin(request: Request): boolean {
 }
 
 async function readBody(request: Request): Promise<string | null> {
-  const maxBytes = 128 * 1024;
+  // 请求体上限 = 文本上限 + JSON 包装开销余量，否则 128 KB 文本会被误判为请求过大。
+  const maxBytes = MAX_TEXT_BYTES + 16 * 1024;
   if (Number(request.headers.get("content-length")) > maxBytes) return null;
   if (!request.body) return "";
   const reader = request.body.getReader();

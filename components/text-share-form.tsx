@@ -161,7 +161,7 @@ export function TextShareForm() {
             id="text-size"
             className={bytes > MAX_TEXT_BYTES ? "text-status-error" : ""}
           >
-            {(bytes / 1024).toFixed(1)} / 48 KB
+            {(bytes / 1024).toFixed(1)} / {MAX_TEXT_BYTES / 1024} KB
           </span>
         </div>
         {error && (
