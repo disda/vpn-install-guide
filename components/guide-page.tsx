@@ -120,9 +120,14 @@ export function GuidePage({
             <span className="brand-divider" />
             <span className="brand-caption">SETUP GUIDE</span>
           </Link>
-          <a className="header-help" href="#faq">
-            遇到问题？<span aria-hidden="true">↗</span>
-          </a>
+          <div className="header-actions">
+            <Link className="header-help" href="/text">
+              长文本分享 ↗
+            </Link>
+            <a className="header-help" href="#faq">
+              遇到问题？<span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
       </header>
       <main id="main" className="container">

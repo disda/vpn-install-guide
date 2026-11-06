@@ -86,3 +86,23 @@ npm run deploy
 `wrangler.jsonc` 指向当前账号的 `vpn-install-guide` Worker 与专用 KV 命名空间。KV 仅存储 Next.js 版本查询缓存，页面 HTML 按 UA 动态渲染。迁移至其他 Cloudflare 账号时，需要修改 `account_id`，并创建、替换 KV 命名空间 ID。
 
 可选的 GitHub 令牌通过 `npx wrangler secret put GITHUB_TOKEN` 设置为 Worker Secret，勿写入配置文件。静态构建产物、Wrangler 本地状态及密钥文件均已加入 Git 忽略。
+
+## 长文本分享
+
+入口为 `/text`，首页导航也可进入。支持非敏感纯文本和 JSON（默认 JSON 模式），最多 48 KB，保留原始空格与换行。前端即时校验，后端再次校验；检测到登录凭证、token、Cookie、密码、敏感字段或较长编码串时拒绝保存。拦截规则有意偏保守，不接收凭证传递用途。
+
+分享 ID 使用随机 UUID，链接不携带原文；分享 24 小时后无法继续读取。持有链接的人可查看、复制、下载和删除。没有公开列表，文本页面和接口不缓存、不索引，来源策略为 `no-referrer`。创建接口要求同源 JSON 请求，并使用 Cloudflare 限流绑定限制提交频率。
+
+分享内容保存于独立的 D1 数据库。到期内容在后续创建或访问时清理，未承诺立即擦除数据库备份。请只分享不含敏感信息的内容。
+
+新环境需要先创建 D1 数据库并更新 `wrangler.jsonc` 中的 `TEXT_SHARE_DB` 绑定，再应用迁移：
+
+```bash
+# 本地开发数据库（仅首次或有新迁移时需要）
+npx wrangler d1 migrations apply TEXT_SHARE_DB --local
+
+# 线上数据库
+npx wrangler d1 migrations apply TEXT_SHARE_DB --remote
+```
+
+接口：`POST /api/text` 创建，`GET /api/text/[id]` 读取，`DELETE /api/text/[id]` 删除。请求和响应不记录原文；应用不提供凭证提取或会话获取教程。

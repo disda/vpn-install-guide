@@ -9,26 +9,41 @@
   "routes": [
     {
       "pattern": "guide.wepic.top",
-      "custom_domain": true
-    }
+      "custom_domain": true,
+    },
   ],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "vpn-install-guide"
-    }
+      "service": "vpn-install-guide",
+    },
   ],
   "kv_namespaces": [
     {
       "binding": "NEXT_INC_CACHE_KV",
-      "id": "d8fe4589bb484a3fb0d4e4c3668e5578"
-    }
+      "id": "d8fe4589bb484a3fb0d4e4c3668e5578",
+    },
+  ],
+  "d1_databases": [
+    {
+      "binding": "TEXT_SHARE_DB",
+      "database_name": "vpn-guide-text-shares",
+      "database_id": "a87272ae-b3eb-4572-8de7-c20582068ca4",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "ratelimits": [
+    {
+      "name": "TEXT_SHARE_RATE_LIMITER",
+      "namespace_id": "310031",
+      "simple": { "limit": 10, "period": 60 },
+    },
   ],
   "observability": {
-    "enabled": true
-  }
+    "enabled": true,
+  },
 }

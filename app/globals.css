@@ -123,6 +123,11 @@ svg {
   font-size: 13px;
   color: var(--muted);
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
 .header-help span {
   margin-left: 9px;
 }
