@@ -10,7 +10,7 @@ export default function TextPage() {
         <h1>
           长文本，发个链接就好<span>。</span>
         </h1>
-        <p>粘贴非敏感文本，生成短链接。对方打开，即可复制完整原文。</p>
+        <p>粘贴长文本，生成短链接。对方打开，即可复制完整原文。</p>
       </section>
       <div className="text-workspace">
         <TextShareForm />
@@ -49,7 +49,7 @@ export default function TextPage() {
           <div className="text-help-note">
             <strong>分享前请留意</strong>
             <p>
-              不接收登录凭证、token、Cookie、密码或其他敏感信息。不要将私人信息放入分享文本。
+              持有链接的人都能打开这份文本，请勿粘贴你不希望被他人看到的私人信息。
             </p>
             <p>
               文本原样保存，不自动格式化。链接 24 小时后失效，也可提前删除。

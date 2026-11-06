@@ -4,7 +4,7 @@ import "./text.css";
 
 export const metadata: Metadata = {
   title: "长文本分享 · 连接指南",
-  description: "分享非敏感长文本或 JSON，原样保存，24 小时后失效。",
+  description: "分享长文本或 JSON，原样保存，24 小时后失效。",
   robots: { index: false, follow: false, nocache: true },
   referrer: "no-referrer",
 };
@@ -31,7 +31,7 @@ export default function TextLayout({
       <main className="text-container">{children}</main>
       <footer>
         <span>
-          长文本分享 <span className="footer-dot">·</span> 只分享非敏感信息
+          长文本分享 <span className="footer-dot">·</span> 链接 24 小时后失效
         </span>
         <span>链接持有者可查看、复制或删除文本</span>
       </footer>

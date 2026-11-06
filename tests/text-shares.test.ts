@@ -100,7 +100,7 @@ test("纯文本与合法 JSON 校验，不改写原文", () => {
   );
 });
 
-test("两种格式均拒绝凭证字段、Cookie、密钥和长编码串", () => {
+test("含凭证字段、Cookie、密钥和长编码串的文本不再被拦截", () => {
   const examples = [
     '{"accessToken":"example-only"}',
     '{"nested":[{"refresh_token":"example-only"}]}',
@@ -120,11 +120,10 @@ test("两种格式均拒绝凭证字段、Cookie、密钥和长编码串", () =>
     '{"access\u200bToken":"example-only"}',
   ];
   for (const text of examples) {
-    for (const format of ["text", "json"] as const) {
-      const result = validateText(text, format);
-      assert.equal(result.ok, false);
-      if (!result.ok) assert.equal(result.code, "credentials");
-    }
+    // 纯文本格式一律放行；本身是合法 JSON 的例子在 JSON 格式下同样放行。
+    assert.deepEqual(validateText(text, "text"), { ok: true });
+    if (text.startsWith("{"))
+      assert.deepEqual(validateText(text, "json"), { ok: true });
   }
 });
 
@@ -149,18 +148,22 @@ test("创建后读取原文完全一致，链接为随机 ID，不包含内容",
   assert.equal((await read.json()).text, text);
 });
 
-test("客户端被绕过时，服务端仍拒绝凭证，且不写入存储", async () => {
+test("客户端直接提交含凭证字段的文本，服务端正常保存并可读回", async () => {
   const { entries, store } = memoryStore();
+  const text = '{"accessToken":"example-only"}';
   for (const format of ["text", "json"]) {
     const response = await createTextShare(
-      request({ text: '{"accessToken":"example-only"}', format }),
+      request({ text, format }),
       store,
       async () => true,
     );
-    assert.equal(response.status, 422);
-    assert.equal((await response.json()).code, "credentials");
-    assert.equal(entries.size, 0);
+    assert.equal(response.status, 201);
+    const { path } = await response.json();
+    const read = await getTextShare(path.split("/").at(-1), store);
+    assert.equal(read.status, 200);
+    assert.equal((await read.json()).text, text);
   }
+  assert.equal(entries.size, 2);
 });
 
 test("非法 JSON、错误模式、额外字段、空文本和过大文本均不入库", async () => {
@@ -214,7 +217,7 @@ test("跨站请求、不支持的请求格式和限流不会写入", async () =>
   assert.equal(entries.size, 0);
 });
 
-test("过期、未知和旧规则下可能保存的凭证文本均无法读取", async () => {
+test("过期与未知分享无法读取；已保存文本不因内容被拦截", async () => {
   const { entries, store } = memoryStore();
   const id = "a".repeat(32);
   assert.equal((await getTextShare("invalid", store)).status, 404);
@@ -235,8 +238,10 @@ test("过期、未知和旧规则下可能保存的凭证文本均无法读取",
     createdAt: Date.now(),
     expiresAt: Date.now() + 10000,
   });
-  assert.equal((await getTextShare(id, store)).status, 404);
-  assert.equal(entries.size, 0);
+  const read = await getTextShare(id, store);
+  assert.equal(read.status, 200);
+  assert.equal((await read.json()).text, '{"cookie":"example-only"}');
+  assert.equal(entries.size, 1);
 });
 
 test("删除需要同站请求，删除后原链接失效", async () => {

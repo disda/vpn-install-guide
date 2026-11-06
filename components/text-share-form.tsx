@@ -13,7 +13,6 @@ type ShareResult = { url: string; path: string; expiresAt: number };
 export function TextShareForm() {
   const [text, setText] = useState("");
   const [format, setFormat] = useState<TextFormat>("json");
-  const [confirmed, setConfirmed] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<ShareResult | null>(null);
@@ -49,10 +48,6 @@ export function TextShareForm() {
     const check = validateText(text, format);
     if (!check.ok) {
       setError(check.error);
-      return;
-    }
-    if (!confirmed) {
-      setError("请先确认文本不包含敏感信息。");
       return;
     }
     setPending(true);
@@ -132,8 +127,8 @@ export function TextShareForm() {
           disabled={pending}
           placeholder={
             format === "json"
-              ? '{\n  "message": "在这里粘贴非敏感 JSON"\n}'
-              : "在这里粘贴非敏感的长文本…"
+              ? '{\n  "message": "在这里粘贴 JSON"\n}'
+              : "在这里粘贴长文本…"
           }
           spellCheck={false}
           autoComplete="off"
@@ -169,18 +164,6 @@ export function TextShareForm() {
             {(bytes / 1024).toFixed(1)} / 48 KB
           </span>
         </div>
-        <label className="text-consent">
-          <input
-            type="checkbox"
-            checked={confirmed}
-            onChange={(event) => setConfirmed(event.target.checked)}
-            required
-            disabled={pending}
-          />
-          <span>
-            我确认文本不包含登录凭证、token、Cookie、密码或其他敏感信息。
-          </span>
-        </label>
         {error && (
           <p className="text-error" role="alert">
             {error}
@@ -189,7 +172,7 @@ export function TextShareForm() {
         <button
           className="primary-button text-submit"
           type="submit"
-          disabled={pending || !validation?.ok || !confirmed}
+          disabled={pending || !validation?.ok}
         >
           {pending ? "正在保存…" : "生成分享链接"}
           <span aria-hidden="true">↗</span>
