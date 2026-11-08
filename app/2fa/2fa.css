@@ -561,7 +561,7 @@
 
 .tfa-icon-btn,
 .tfa-action-icon {
-  color: #64748b;
+  color: #8494ab;
 }
 .tfa-icon-btn:hover,
 .tfa-action-icon:hover {
@@ -578,4 +578,27 @@
 .tfa-action-icon.is-saved:hover {
   color: #2f6df0;
   background: transparent;
+}
+
+/* 对齐参考：当前排序列蓝色、操作图标间距拉开、行首行钥匙 tile、动态码字距 */
+.tfa-head-btn.is-sorted {
+  color: #2f6df0;
+}
+.tfa-saved-actions,
+.tfa-recent-actions {
+  gap: 12px;
+}
+.tfa-key-tile {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #e8eefc;
+  color: #2f6df0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.tfa-live-code {
+  letter-spacing: 1.5px;
 }

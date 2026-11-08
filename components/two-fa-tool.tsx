@@ -18,13 +18,14 @@ import {
 } from "@/lib/totp";
 import {
   IconCheck,
-  IconChevronDown,
-  IconChevronUp,
-  IconChevronsUpDown,
+  IconArrowDown,
+  IconArrowUp,
+  IconArrowUpDown,
   IconClock,
   IconCopy,
   IconDownload,
   IconHistory,
+  IconKey,
   IconPencil,
   IconSearch,
   IconStar,
@@ -246,11 +247,11 @@ export function TwoFaTool() {
   }
 
   function sortIcon(by: SortState["by"]) {
-    if (sort.by !== by) return <IconChevronsUpDown size={16} />;
+    if (sort.by !== by) return <IconArrowUpDown size={16} />;
     return sort.dir === 1 ? (
-      <IconChevronUp size={16} />
+      <IconArrowUp size={16} />
     ) : (
-      <IconChevronDown size={16} />
+      <IconArrowDown size={16} />
     );
   }
 
@@ -676,7 +677,7 @@ export function TwoFaTool() {
               <div className="tfa-saved-head">
                 <button
                   type="button"
-                  className="tfa-head-btn"
+                  className={`tfa-head-btn${sort.by === "name" ? " is-sorted" : ""}`}
                   onClick={() => toggleSort("name")}
                 >
                   账号名 {sortIcon("name")}
@@ -688,7 +689,7 @@ export function TwoFaTool() {
                 </span>
                 <button
                   type="button"
-                  className="tfa-head-btn"
+                  className={`tfa-head-btn${sort.by === "time" ? " is-sorted" : ""}`}
                   onClick={() => toggleSort("time")}
                 >
                   保存时间 {sortIcon("time")}
@@ -805,7 +806,7 @@ export function TwoFaTool() {
               <div className="tfa-saved-head tfa-recent-head">
                 <button
                   type="button"
-                  className="tfa-head-btn"
+                  className={`tfa-head-btn${sort.by === "name" ? " is-sorted" : ""}`}
                   onClick={() => toggleSort("name")}
                 >
                   账号名 {sortIcon("name")}
@@ -817,7 +818,7 @@ export function TwoFaTool() {
                 </span>
                 <button
                   type="button"
-                  className="tfa-head-btn"
+                  className={`tfa-head-btn${sort.by === "time" ? " is-sorted" : ""}`}
                   onClick={() => toggleSort("time")}
                 >
                   时间 {sortIcon("time")}
@@ -832,7 +833,12 @@ export function TwoFaTool() {
                     className="tfa-saved-row tfa-recent-row"
                     key={row.key}
                   >
-                    <span className="tfa-saved-name">{row.name}</span>
+                    <span className="tfa-saved-name">
+                      <span className="tfa-key-tile">
+                        <IconKey size={16} />
+                      </span>
+                      {row.name}
+                    </span>
                     <span className="tfa-saved-secret">
                       {row.secret}
                       <button

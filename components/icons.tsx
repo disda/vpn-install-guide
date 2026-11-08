@@ -171,3 +171,42 @@ export function IconChevronsUpDown(props: IconProps) {
     </Svg>
   );
 }
+
+export function IconArrowUp(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <line x1="12" y1="19" x2="12" y2="5" />
+      <polyline points="5 12 12 5 19 12" />
+    </Svg>
+  );
+}
+
+export function IconArrowDown(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <polyline points="19 12 12 19 5 12" />
+    </Svg>
+  );
+}
+
+export function IconArrowUpDown(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="m21 16-4 4-4-4" />
+      <path d="M17 20V4" />
+      <path d="m3 8 4-4 4 4" />
+      <path d="M7 4v16" />
+    </Svg>
+  );
+}
+
+export function IconKey(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="8" cy="15.5" r="4.5" />
+      <path d="m11.2 12.3 8.3-8.3" />
+      <path d="M15.5 6.5 19 10" />
+    </Svg>
+  );
+}
