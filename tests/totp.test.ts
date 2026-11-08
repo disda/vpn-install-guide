@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   base32Decode,
   detectBareSecrets,
+  extractTotpSecrets,
   formatCode,
   generateTotp,
   maskSecret,
@@ -61,6 +62,27 @@ test("裸密钥检测：一行一个、去重，普通文本与 JSON 不误报",
     [],
   );
   assert.deepEqual(detectBareSecrets("SHORT"), []);
+});
+
+test("工具页提取：完整格式优先取第 3 段，裸密钥逐行取", () => {
+  assert.deepEqual(
+    extractTotpSecrets(
+      "1001|passw0rd|JBSWY3DPEHPK3PXP|a@b.com|mailpass",
+    ),
+    ["JBSWY3DPEHPK3PXP"],
+  );
+  // 第 3 段不合法时退回行内第一个合法段
+  assert.deepEqual(extractTotpSecrets("1001|GEZDGNBVGY3TQOJQ|not-a-secret"), [
+    "GEZDGNBVGY3TQOJQ",
+  ]);
+  // 裸密钥与完整格式混排、跨格式去重
+  assert.deepEqual(
+    extractTotpSecrets(
+      "JBSWY3DPEHPK3PXP\n1002|pw|jbswy3dpehpk3pxp|a@b.com|x\nGEZDGNBVGY3TQOJQ",
+    ),
+    ["JBSWY3DPEHPK3PXP", "GEZDGNBVGY3TQOJQ"],
+  );
+  assert.deepEqual(extractTotpSecrets("just some text\nanother line"), []);
 });
 
 test("验证码格式化与密钥脱敏", () => {

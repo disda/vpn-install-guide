@@ -1,0 +1,135 @@
+.tfa-tool textarea {
+  min-height: 130px;
+}
+.tfa-format-hint {
+  margin: 8px 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.tfa-submit {
+  min-height: 38px;
+  padding: 0 18px;
+}
+.tfa-results {
+  margin-top: 22px;
+}
+.tfa-results h3 {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #1d2b43;
+}
+.tfa-table-head,
+.tfa-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 1.1fr) 70px minmax(160px, 1.4fr);
+  gap: 14px;
+  align-items: center;
+}
+.tfa-table-head {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 0 2px 8px;
+}
+.tfa-row {
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+}
+.tfa-code-cell {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: #eef1f5;
+  border-radius: 9px;
+  overflow: hidden;
+  min-width: 0;
+}
+.tfa-code {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  font-family: ui-monospace, monospace;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #1d2b43;
+  white-space: nowrap;
+}
+.tfa-copy {
+  border: 0;
+  background: #dff5ec;
+  color: #15916c;
+  font-size: 12px;
+  padding: 0 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tfa-copy:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.tfa-time {
+  font-size: 14px;
+  color: #e05f4e;
+  white-space: nowrap;
+}
+.tfa-secret {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: #3c4a61;
+  background: #eef1f5;
+  border-radius: 9px;
+  padding: 9px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tfa-local-note {
+  margin: 12px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.tfa-usage {
+  margin-top: 26px;
+  padding: 20px 22px;
+  background: #f2f6ff;
+  border: 1px solid #d9e6ff;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.9;
+  color: #3c4a61;
+}
+.tfa-usage h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: #2f6df0;
+}
+.tfa-usage p {
+  margin: 0 0 8px;
+}
+.tfa-usage ol {
+  margin: 0;
+  padding-left: 20px;
+}
+@media (max-width: 600px) {
+  .tfa-table-head {
+    display: none;
+  }
+  .tfa-row {
+    grid-template-columns: 1fr 52px;
+    grid-template-areas:
+      "code time"
+      "secret secret";
+    row-gap: 8px;
+  }
+  .tfa-code-cell {
+    grid-area: code;
+  }
+  .tfa-time {
+    grid-area: time;
+    text-align: right;
+  }
+  .tfa-secret {
+    grid-area: secret;
+  }
+}

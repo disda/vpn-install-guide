@@ -121,6 +121,9 @@ export function GuidePage({
             <span className="brand-caption">SETUP GUIDE</span>
           </Link>
           <div className="header-actions">
+            <Link className="header-help" href="/2fa">
+              2FA 验证 ↗
+            </Link>
             <Link className="header-help" href="/text">
               长文本分享 ↗
             </Link>

@@ -73,25 +73,59 @@ export async function generateTotp(
 const MIN_SECRET_LENGTH = 16;
 const MAX_SECRET_LENGTH = 128;
 
+function qualifySecret(candidate: string): string | null {
+  const normalized = normalizeSecret(candidate.trim());
+  if (
+    normalized &&
+    normalized.length >= MIN_SECRET_LENGTH &&
+    normalized.length <= MAX_SECRET_LENGTH
+  )
+    return normalized;
+  return null;
+}
+
 /**
- * 从分享文本里找裸密钥：一行一个密钥（整段只有一行时就是那一行）。
+ * 从文本里找裸密钥：一行一个密钥（整段只有一行时就是那一行）。
  * 仅当某一行归一化后是合法 Base32 且长度在 16–128 之间才算，避免误报。
  * 返回去重后的归一化密钥列表，最多 20 个。
  */
 export function detectBareSecrets(text: string): string[] {
   const seen = new Set<string>();
   for (const line of text.split(/\r?\n/)) {
-    const candidate = line.trim();
-    if (!candidate) continue;
-    const normalized = normalizeSecret(candidate);
-    if (
-      normalized &&
-      normalized.length >= MIN_SECRET_LENGTH &&
-      normalized.length <= MAX_SECRET_LENGTH
-    ) {
-      seen.add(normalized);
-    }
+    if (!line.trim()) continue;
+    const normalized = qualifySecret(line);
+    if (normalized) seen.add(normalized);
     if (seen.size >= 20) break;
+  }
+  return [...seen];
+}
+
+/**
+ * 2FA 工具页的输入提取：一行一个条目。
+ * - 整行是裸密钥：直接用。
+ * - 「UID|密码|2FA|邮箱|邮箱密码...」完整格式：优先取第 3 段（2FA 位置），
+ *   该段不合法时退回取行内第一个合法的段。
+ * 返回去重后的归一化密钥列表，最多 50 个。
+ */
+export function extractTotpSecrets(text: string): string[] {
+  const seen = new Set<string>();
+  for (const line of text.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    let found: string | null = null;
+    if (trimmed.includes("|")) {
+      const fields = trimmed.split("|");
+      const ordered = [fields[2], ...fields];
+      for (const field of ordered) {
+        if (field === undefined) continue;
+        found = qualifySecret(field);
+        if (found) break;
+      }
+    } else {
+      found = qualifySecret(trimmed);
+    }
+    if (found) seen.add(found);
+    if (seen.size >= 50) break;
   }
   return [...seen];
 }
