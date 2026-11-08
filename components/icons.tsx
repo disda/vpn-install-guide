@@ -10,8 +10,9 @@ function Svg({
   size = 16,
   className,
   filled = false,
+  o = 1,
   children,
-}: IconProps & { filled?: boolean; children: ReactNode }) {
+}: IconProps & { filled?: boolean; o?: number; children: ReactNode }) {
   return (
     <svg
       width={size}
@@ -26,14 +27,16 @@ function Svg({
       focusable="false"
       className={className}
     >
-      {children}
+      <g transform={`translate(${12 - 12 * o} ${12 - 12 * o}) scale(${o})`}>
+        {children}
+      </g>
     </svg>
   );
 }
 
 export function IconCopy(props: IconProps) {
   return (
-    <Svg {...props}>
+    <Svg {...props} o={0.88}>
       <rect x="9" y="9" width="13" height="13" rx="2" />
       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
     </Svg>
@@ -50,7 +53,7 @@ export function IconCheck(props: IconProps) {
 
 export function IconPencil(props: IconProps) {
   return (
-    <Svg {...props}>
+    <Svg {...props} o={0.9}>
       <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
       <path d="m15 5 4 4" />
     </Svg>
@@ -74,7 +77,7 @@ const STAR_PATH =
 
 export function IconStar(props: IconProps) {
   return (
-    <Svg {...props}>
+    <Svg {...props} o={0.86}>
       <path d={STAR_PATH} />
     </Svg>
   );
@@ -82,7 +85,7 @@ export function IconStar(props: IconProps) {
 
 export function IconStarFilled(props: IconProps) {
   return (
-    <Svg {...props} filled>
+    <Svg {...props} filled o={0.86}>
       <path d={STAR_PATH} />
     </Svg>
   );
@@ -93,7 +96,6 @@ export function IconHistory(props: IconProps) {
     <Svg {...props}>
       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
       <path d="M3 3v5h5" />
-      <path d="M12 7v5l4 2" />
     </Svg>
   );
 }
@@ -130,7 +132,7 @@ export function IconDownload(props: IconProps) {
 export function IconSearch(props: IconProps) {
   return (
     <Svg {...props}>
-      <circle cx="11" cy="11" r="8" />
+      <circle cx="11" cy="11" r="9" />
       <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </Svg>
   );
@@ -147,7 +149,7 @@ export function IconArrowUpRight(props: IconProps) {
 
 export function IconChevronUp(props: IconProps) {
   return (
-    <Svg {...props}>
+    <Svg {...props} o={0.9}>
       <polyline points="18 15 12 9 6 15" />
     </Svg>
   );
@@ -155,7 +157,7 @@ export function IconChevronUp(props: IconProps) {
 
 export function IconChevronDown(props: IconProps) {
   return (
-    <Svg {...props}>
+    <Svg {...props} o={0.9}>
       <polyline points="6 9 12 15 18 9" />
     </Svg>
   );
@@ -163,7 +165,7 @@ export function IconChevronDown(props: IconProps) {
 
 export function IconChevronsUpDown(props: IconProps) {
   return (
-    <Svg {...props}>
+    <Svg {...props} o={0.78}>
       <path d="m7 9 5-5 5 5" />
       <path d="m7 15 5 5 5-5" />
     </Svg>
