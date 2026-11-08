@@ -10,6 +10,8 @@ import {
 import Link from "next/link";
 import type { TextShare } from "@/lib/text-shares";
 import { extractSharedEmail } from "@/lib/text-share-insights";
+import { detectBareSecrets } from "@/lib/totp";
+import { TextShareTotp } from "@/components/text-share-totp";
 import {
   loadShareNote,
   saveShareNote,
@@ -33,6 +35,7 @@ export function TextShareViewer({ share }: { share: TextShare }) {
   const [deleting, setDeleting] = useState(false);
   const content = useRef<HTMLTextAreaElement>(null);
   const accountEmail = useMemo(() => extractSharedEmail(share.text), [share.text]);
+  const bareSecrets = useMemo(() => detectBareSecrets(share.text), [share.text]);
   const getNoteSnapshot = useCallback(
     () => loadShareNote(window.localStorage, share.id),
     [share.id],
@@ -219,6 +222,7 @@ export function TextShareViewer({ share }: { share: TextShare }) {
         ) : (
           <div className="text-note-banner">{noteEditor}</div>
         )}
+        {bareSecrets.length > 0 && <TextShareTotp secrets={bareSecrets} />}
         <label className="text-area-label" htmlFor="shared-content">
           分享的原文
         </label>
