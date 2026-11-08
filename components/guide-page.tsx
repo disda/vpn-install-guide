@@ -128,6 +128,9 @@ export function GuidePage({
             <Link className="header-help" href="/text">
               长文本分享 <ArrowUpRight size={16} />
             </Link>
+            <Link className="header-help" href="/codex-reset">
+              Codex 重置 <ArrowUpRight size={16} />
+            </Link>
             <a className="header-help" href="#faq">
               遇到问题？<ArrowUpRight size={16} />
             </a>
