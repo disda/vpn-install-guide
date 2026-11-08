@@ -116,3 +116,5 @@ npx wrangler d1 migrations apply TEXT_SHARE_DB --remote
 - `GET /backend-api/wham/usage`：Codex 额度，短/长窗口的已用百分比、重置时间与可用重置次数。
 
 查询接口要求同源 JSON 请求，只接受 accessToken、accountId、timezoneOffsetMin 三个字段，并复用长文本分享的限流绑定（每分钟 10 次/IP）。页面与接口均 no-store、noindex、no-referrer。Session 等同于登录凭证，页面明确提示只能查自己的账号、不要把凭证发给任何人。
+
+注意：实测 ChatGPT 会拦截 Cloudflare Workers 出口的请求（同一有效凭证经服务器查询返回 403、从普通网络直查为 200；浏览器从本站直连 chatgpt.com 又会被其 CORS 拒绝）。因此页面另提供「浏览器内查询」：书签脚本（`lib/chatgpt-bookmarklet.ts`）在用户自己浏览器的 chatgpt.com 页面内同源直查三个接口，结果先在页面浮层直接展示摘要，再复制为不含任何凭证的结果包（`kind: chatgpt-check-result-v1`），粘回 `/chatgpt` 由 `parseResultBundle` 解析成同样的图表结果。403 的错误文案已改为说明服务器出口被拦、不再误报凭证过期。

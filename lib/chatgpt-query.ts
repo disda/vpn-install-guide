@@ -356,8 +356,10 @@ export type QueryResult = {
 };
 
 function upstreamError(status: number): string {
-  if (status === 401 || status === 403)
-    return "登录凭证已过期或已被失效（上游返回 " + status + "）。请重新登录 ChatGPT 后再获取一次 Session。";
+  if (status === 401)
+    return "登录凭证已失效或已过期（上游返回 401）。请重新登录 ChatGPT 后再获取一次 Session。";
+  if (status === 403)
+    return "ChatGPT 拒绝了本站服务器的请求（403）。实测同一凭证从普通网络可以正常查询，这是服务器出口被上游拦截、不是凭证过期。请改用下方「浏览器内查询」。";
   if (status === 429) return "查询太频繁，上游限流了（429），请过一会儿再试。";
   return `上游接口返回错误 ${status}，请稍后重试。`;
 }
@@ -459,4 +461,82 @@ export async function queryChatGptAccount(options: {
   }
 
   return { subscription, subscriptionError, usage, usageError };
+}
+
+// ---------- 浏览器内查询：结果包解析 ----------
+
+export type BundleSession = {
+  email: string | null;
+  accountId: string | null;
+  planType: string | null;
+  sessionExpires: string | null;
+  tokenExpiresAt: number | null;
+};
+
+export type BundleParse =
+  | {
+      ok: true;
+      session: BundleSession;
+      subscription: SubscriptionInfo | null;
+      subscriptionError: string | null;
+      usage: UsageInfo | null;
+      usageError: string | null;
+    }
+  | { ok: false; error: string };
+
+export function parseResultBundle(text: string): BundleParse {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return {
+      ok: false,
+      error: "这不是书签脚本复制的结果 JSON。请在 chatgpt.com 页面点一次查询书签，再把复制到的完整结果粘贴进来。",
+    };
+  }
+  const root = asRecord(parsed);
+  if (!root || (root.kind !== "chatgpt-check-result-v1" && !root.accountCheck && !root.usage)) {
+    return {
+      ok: false,
+      error: "没有识别到查询结果包。请粘贴书签脚本复制的完整结果，不要粘贴 Session。",
+    };
+  }
+  const rawSession = asRecord(root.session);
+  const session: BundleSession = {
+    email: firstStr(rawSession, ["email"]),
+    accountId: firstStr(rawSession, ["accountId", "account_id"]),
+    planType: firstStr(rawSession, ["planType", "plan_type"]),
+    sessionExpires: firstStr(rawSession, ["expires"]),
+    tokenExpiresAt:
+      typeof rawSession?.tokenExpiresAt === "number"
+        ? rawSession.tokenExpiresAt
+        : null,
+  };
+  let subscription = root.accountCheck
+    ? parseAccountCheck(root.accountCheck, session.accountId)
+    : null;
+  let subscriptionError: string | null = subscription
+    ? null
+    : "结果包里没有可用的订阅信息。";
+  if (root.subscriptions) {
+    const extra = parseSubscriptions(root.subscriptions, session.accountId);
+    if (extra) {
+      subscription = {
+        accountId: subscription?.accountId ?? extra.accountId,
+        planType: subscription?.planType ?? extra.planType,
+        activeUntil: subscription?.activeUntil ?? extra.activeUntil,
+      };
+      if (subscription.activeUntil || subscription.planType)
+        subscriptionError = null;
+    }
+  }
+  const usage = root.usage ? parseUsage(root.usage) : null;
+  return {
+    ok: true,
+    session,
+    subscription,
+    subscriptionError,
+    usage,
+    usageError: usage ? null : "结果包里没有可用的额度信息。",
+  };
 }

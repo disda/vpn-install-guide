@@ -2,10 +2,12 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 import {
+  parseResultBundle,
   parseSessionInput,
   type QueryResult,
   type SessionInfo,
 } from "@/lib/chatgpt-query";
+import { BOOKMARKLET_CODE } from "@/lib/chatgpt-bookmarklet";
 
 type LocalInfo = Omit<SessionInfo, "accessToken">;
 
@@ -106,6 +108,43 @@ export function ChatGptQueryForm() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<QueryResult | null>(null);
   const [resultLocal, setResultLocal] = useState<LocalInfo | null>(null);
+  const [bundleText, setBundleText] = useState("");
+  const [bundleError, setBundleError] = useState("");
+  const [bookmarkCopyStatus, setBookmarkCopyStatus] = useState("");
+
+  async function copyBookmarklet() {
+    try {
+      await navigator.clipboard.writeText(BOOKMARKLET_CODE);
+      setBookmarkCopyStatus("书签脚本已复制。按下方步骤把它存成书签。");
+    } catch {
+      setBookmarkCopyStatus("自动复制失败，请长按/全选下方代码手动复制。");
+    }
+  }
+
+  function parseBundle() {
+    setBundleError("");
+    const parsedBundle = parseResultBundle(bundleText);
+    if (!parsedBundle.ok) {
+      setBundleError(parsedBundle.error);
+      return;
+    }
+    setResult({
+      subscription: parsedBundle.subscription,
+      subscriptionError: parsedBundle.subscriptionError,
+      usage: parsedBundle.usage,
+      usageError: parsedBundle.usageError,
+    });
+    setResultLocal({
+      email: parsedBundle.session.email,
+      userId: null,
+      accountId: parsedBundle.session.accountId,
+      planType: parsedBundle.session.planType,
+      sessionExpires: parsedBundle.session.sessionExpires,
+      tokenIssuedAt: null,
+      tokenExpiresAt: parsedBundle.session.tokenExpiresAt,
+    });
+    setBundleText("");
+  }
 
   const parsed = useMemo(
     () => (text.trim() ? parseSessionInput(text) : null),
@@ -262,6 +301,87 @@ export function ChatGptQueryForm() {
           只查询你自己的账号。查询时凭证仅经本站转发给 chatgpt.com，本站不保存、不记录；查完自动清空输入框。
         </p>
       </form>
+
+      <section className="text-editor gpt-browser-method" id="browser-method">
+        <div className="text-editor-heading">
+          <div>
+            <h2>浏览器内查询（服务器被拦时用这个）</h2>
+            <p>
+              ChatGPT 会拦截本站服务器的请求（403），但不会拦你自己浏览器。
+              这个书签脚本只在 chatgpt.com 页面里、用你已有的登录态直查，
+              不经过任何服务器。
+            </p>
+          </div>
+          <span className="text-expiry-badge">推荐</span>
+        </div>
+        <ol className="gpt-method-steps">
+          <li>
+            点「复制书签脚本」，新建一个书签（收藏），名字随便写，把网址
+            一栏替换成粘贴的脚本代码并保存。电脑 Chrome
+            可右键书签栏「添加网页」；安卓 Chrome
+            先随便收藏一页，再到收藏夹里编辑它的网址。
+          </li>
+          <li>
+            打开并登录 chatgpt.com，在地址栏输入你存的书签名字、点它运行
+            （安卓 Chrome 需要从地址栏搜索里点这个书签，直接在收藏夹里点不会在当前页运行）。
+          </li>
+          <li>
+            页面底部会直接弹出套餐到期和额度摘要，点「复制完整结果」，
+            回到本页粘贴到下面，就能看图表版结果。结果包不含任何登录凭证。
+          </li>
+        </ol>
+        <button
+          className="primary-button text-submit"
+          type="button"
+          onClick={copyBookmarklet}
+        >
+          复制书签脚本
+        </button>
+        {bookmarkCopyStatus && (
+          <p className="gpt-partial-note" role="status">
+            {bookmarkCopyStatus}
+          </p>
+        )}
+        <label className="text-area-label" htmlFor="gpt-bookmarklet-code">
+          书签脚本（可先核对内容再使用，只请求 chatgpt.com）
+        </label>
+        <textarea
+          id="gpt-bookmarklet-code"
+          readOnly
+          value={BOOKMARKLET_CODE}
+          rows={4}
+          spellCheck={false}
+          onFocus={(event) => event.currentTarget.select()}
+        />
+        <label className="text-area-label" htmlFor="gpt-bundle">
+          粘贴查询结果
+        </label>
+        <textarea
+          id="gpt-bundle"
+          value={bundleText}
+          onChange={(event) => {
+            setBundleText(event.target.value);
+            setBundleError("");
+          }}
+          placeholder="把书签脚本复制的完整结果粘贴到这里…"
+          spellCheck={false}
+          autoComplete="off"
+          autoCapitalize="off"
+        />
+        {bundleError && (
+          <p className="text-error" role="alert">
+            {bundleError}
+          </p>
+        )}
+        <button
+          className="primary-button text-submit"
+          type="button"
+          disabled={!bundleText.trim()}
+          onClick={parseBundle}
+        >
+          解析查询结果
+        </button>
+      </section>
 
       {result && (
         <section className="gpt-result" aria-label="查询结果">
