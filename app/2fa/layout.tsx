@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { IconArrowUpRight } from "@/components/icons";
+import { ArrowUpRight } from "lucide-react";
 import "../text/text.css";
 import "./2fa.css";
 
@@ -22,12 +22,12 @@ export default function TwoFaLayout({
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" href="/">
-            <span className="brand-mark"><IconArrowUpRight size={16} /></span>连接指南
+            <span className="brand-mark"><ArrowUpRight size={16} /></span>连接指南
             <span className="brand-divider" />
             <span className="brand-caption">2FA TOOL</span>
           </Link>
           <Link className="header-help" href="/">
-            返回安装指南 <IconArrowUpRight size={16} />
+            返回安装指南 <ArrowUpRight size={16} />
           </Link>
         </div>
       </header>
