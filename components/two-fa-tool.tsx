@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -17,13 +18,12 @@ import {
 } from "@/lib/totp";
 import {
   EMPTY_TWO_FA_STORE,
+  isRealLabel,
   parseTwoFaStore,
   pushRecent,
-  recentDisplayLabels,
   savedNameFor,
   TWO_FA_STORE_KEY,
   upsertSaved,
-  type RecentEntry,
   type TwoFaStoreData,
 } from "@/lib/two-fa-storage";
 
@@ -79,14 +79,14 @@ function newId(): string {
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
-function formatTime(at: number): string {
-  const date = new Date(at);
-  return `${pad2(date.getMonth() + 1)}/${pad2(date.getDate())} ${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
-}
-
 function formatDateTime(at: number): string {
   const date = new Date(at);
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())} ${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
+}
+
+function formatDateTimeSec(at: number): string {
+  const date = new Date(at);
+  return `${formatDateTime(at)}:${pad2(date.getSeconds())}`;
 }
 
 /** 订阅一组密钥的实时验证码：到点自动换码，返回 {codes, remaining}。 */
@@ -129,6 +129,17 @@ function useLiveCodes(secretsKey: string) {
   return { codes, remaining, setRemaining };
 }
 
+type SortState = { by: "time" | "name"; dir: 1 | -1 };
+
+interface RecentRow {
+  key: string;
+  recentId: string;
+  secret: string;
+  label: string;
+  name: string;
+  at: number;
+}
+
 export function TwoFaTool() {
   const store = useSyncExternalStore(
     subscribe,
@@ -144,8 +155,33 @@ export function TwoFaTool() {
   const [editingId, setEditingId] = useState("");
   const [draftName, setDraftName] = useState("");
   const [ioMsg, setIoMsg] = useState("");
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<SortState>({ by: "time", dir: -1 });
   const toolRef = useRef<HTMLElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const savedSecrets = useMemo(
+    () => new Set(store.saved.map((item) => item.secret)),
+    [store.saved],
+  );
+
+  const recentRowsAll = useMemo<RecentRow[]>(
+    () =>
+      store.recent.flatMap((item) =>
+        item.secrets.map((secret, index) => {
+          const label = item.labels[index] ?? "";
+          return {
+            key: `${item.id}:${secret}`,
+            recentId: item.id,
+            secret,
+            label,
+            name: isRealLabel(label, secret) ? label : "--",
+            at: item.at,
+          };
+        }),
+      ),
+    [store.recent],
+  );
 
   const resultCodes = useLiveCodes(
     entries?.map((entry) => entry.secret).join("\n") ?? "",
@@ -153,6 +189,50 @@ export function TwoFaTool() {
   const savedLive = useLiveCodes(
     store.saved.map((item) => item.secret).join("\n"),
   );
+  const recentLive = useLiveCodes(
+    [...new Set(recentRowsAll.map((row) => row.secret))].join("\n"),
+  );
+
+  const searchNeedle = search.trim().toLowerCase();
+  const matchesSearch = (name: string, secret: string, label = "") =>
+    !searchNeedle ||
+    name.toLowerCase().includes(searchNeedle) ||
+    secret.toLowerCase().includes(searchNeedle) ||
+    label.toLowerCase().includes(searchNeedle);
+
+  const applySort = <T extends { at: number; name: string }>(rows: T[]) => {
+    const sorted = [...rows];
+    sorted.sort((a, b) =>
+      sort.by === "time"
+        ? (a.at - b.at) * sort.dir
+        : a.name.localeCompare(b.name) * sort.dir,
+    );
+    return sorted;
+  };
+
+  const savedRows = applySort(
+    store.saved
+      .filter((item) => matchesSearch(item.name, item.secret))
+      .map((item) => ({ ...item, at: item.createdAt, name: item.name })),
+  );
+  const recentRows = applySort(
+    recentRowsAll.filter((row) =>
+      matchesSearch(row.name, row.secret, row.label),
+    ),
+  );
+
+  function toggleSort(by: SortState["by"]) {
+    setSort((current) =>
+      current.by === by
+        ? { by, dir: current.dir === 1 ? -1 : 1 }
+        : { by, dir: by === "time" ? -1 : 1 },
+    );
+  }
+
+  function sortArrow(by: SortState["by"]) {
+    if (sort.by !== by) return "↕";
+    return sort.dir === 1 ? "↑" : "↓";
+  }
 
   function flashCopied(key: string) {
     setCopiedKey(key);
@@ -249,16 +329,6 @@ export function TwoFaTool() {
     if (added > 0) setActiveTab("saved");
   }
 
-  function saveRecent(item: RecentEntry) {
-    saveEntries(
-      item.secrets.map((secret, index) => ({
-        secret,
-        label: item.labels[index] ?? "",
-      })),
-    );
-    setActiveTab("saved");
-  }
-
   function removeSaved(id: string) {
     const current = getSnapshot();
     writeStore({
@@ -280,12 +350,29 @@ export function TwoFaTool() {
     setEditingId("");
   }
 
-  function removeRecent(id: string) {
+  function removeRecentEntry(id: string) {
     const current = getSnapshot();
     writeStore({
       ...current,
       recent: current.recent.filter((item) => item.id !== id),
     });
+  }
+
+  function removeRecentSecret(recentId: string, secret: string) {
+    const current = getSnapshot();
+    const recent = current.recent
+      .map((item) => {
+        if (item.id !== recentId) return item;
+        const index = item.secrets.indexOf(secret);
+        if (index < 0) return item;
+        return {
+          ...item,
+          secrets: item.secrets.filter((_, i) => i !== index),
+          labels: item.labels.filter((_, i) => i !== index),
+        };
+      })
+      .filter((item) => item.secrets.length > 0);
+    writeStore({ ...current, recent });
   }
 
   function clearRecent() {
@@ -366,7 +453,6 @@ export function TwoFaTool() {
             : candidate.name,
       })),
     );
-    // 导入时保留文件里的自定义名：saveEntries 用标签命名，这里补正
     const current = getSnapshot();
     const bySecret = new Map(
       candidates.map((candidate) => [candidate.secret, candidate.name]),
@@ -383,8 +469,6 @@ export function TwoFaTool() {
       `导入 ${added} 个${candidates.length - added > 0 ? `，跳过 ${candidates.length - added} 个（已存在）` : ""}`,
     );
   }
-
-  const savedSecrets = new Set(store.saved.map((item) => item.secret));
 
   return (
     <>
@@ -501,7 +585,7 @@ export function TwoFaTool() {
             className={activeTab === "recent" ? "active" : ""}
             onClick={() => setActiveTab("recent")}
           >
-            ◷ 近期查询（{store.recent.length}）
+            ◷ 近期查询（{recentRowsAll.length}）
           </button>
           <span className="tfa-tabs-spacer" />
           {activeTab === "saved" && store.saved.length > 0 && (
@@ -522,11 +606,6 @@ export function TwoFaTool() {
               </button>
             </>
           )}
-          {activeTab === "recent" && store.recent.length > 0 && (
-            <button type="button" className="tfa-clear" onClick={clearRecent}>
-              清空
-            </button>
-          )}
         </div>
         <input
           ref={fileRef}
@@ -539,6 +618,26 @@ export function TwoFaTool() {
             if (file) void importSaved(file);
           }}
         />
+        {(store.saved.length > 0 || store.recent.length > 0) && (
+          <div className="tfa-search-row">
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="🔍 搜索账号名或秘钥"
+              aria-label="搜索账号名或秘钥"
+            />
+            {activeTab === "recent" && store.recent.length > 0 && (
+              <button
+                type="button"
+                className="tfa-io-btn"
+                onClick={clearRecent}
+              >
+                清空
+              </button>
+            )}
+          </div>
+        )}
         <p className="tfa-store-note">只保存在本机浏览器</p>
         {ioMsg && <p className="tfa-io-msg">{ioMsg}</p>}
 
@@ -547,16 +646,33 @@ export function TwoFaTool() {
             <p className="tfa-empty">
               还没有保存的密钥。在上方输入密钥后点「保存到列表」，或在查询结果、近期查询里保存。
             </p>
+          ) : savedRows.length === 0 ? (
+            <p className="tfa-empty">没有匹配「{search}」的已保存条目。</p>
           ) : (
             <>
-              <div className="tfa-saved-head" aria-hidden="true">
-                <span>账号名</span>
+              <div className="tfa-saved-head">
+                <button
+                  type="button"
+                  className="tfa-head-btn"
+                  onClick={() => toggleSort("name")}
+                >
+                  账号名 {sortArrow("name")}
+                </button>
                 <span>秘钥</span>
-                <span>动态码</span>
-                <span>保存时间</span>
+                <span>
+                  动态码{" "}
+                  <span className="tfa-badge">{savedLive.remaining}s</span>
+                </span>
+                <button
+                  type="button"
+                  className="tfa-head-btn"
+                  onClick={() => toggleSort("time")}
+                >
+                  保存时间 {sortArrow("time")}
+                </button>
                 <span>操作</span>
               </div>
-              {store.saved.map((item) => {
+              {savedRows.map((item) => {
                 const code = savedLive.codes[item.secret];
                 return (
                   <div className="tfa-saved-row" key={item.id}>
@@ -618,7 +734,6 @@ export function TwoFaTool() {
                       <span className="tfa-live-code">
                         {code ?? "······"}
                       </span>
-                      <span className="tfa-badge">{savedLive.remaining}s</span>
                       <button
                         type="button"
                         className="tfa-icon-btn"
@@ -654,51 +769,121 @@ export function TwoFaTool() {
           ))}
 
         {activeTab === "recent" &&
-          (store.recent.length === 0 ? (
+          (recentRowsAll.length === 0 ? (
             <p className="tfa-empty">
               还没有查询记录。在上方输入密钥点「查询」后会自动记到这里（最多
-              10 条）。
+              10 次查询）。
             </p>
+          ) : recentRows.length === 0 ? (
+            <p className="tfa-empty">没有匹配「{search}」的近期查询。</p>
           ) : (
-            store.recent.map((item) => {
-              const allSaved = item.secrets.every((secret) =>
-                savedSecrets.has(secret),
-              );
-              return (
-                <div className="tfa-store-row" key={item.id}>
-                  <span className="tfa-store-name">
-                    {recentDisplayLabels(item).join("、")}
-                    {item.secrets.length > 1
-                      ? `（共 ${item.secrets.length} 个）`
-                      : ""}
-                  </span>
-                  <span className="tfa-store-secret">
-                    {formatTime(item.at)}
-                  </span>
-                  <span className="tfa-store-actions">
-                    <button
-                      type="button"
-                      onClick={() => loadAndScroll(item.secrets.join("\n"))}
-                    >
-                      载入
-                    </button>
-                    <button
-                      type="button"
-                      disabled={allSaved}
-                      onClick={() => saveRecent(item)}
-                    >
-                      {allSaved ? "已保存" : "保存到列表"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeRecent(item.id)}
-                    >
-                      删除
-                    </button>
-                  </span>
-                </div>
-              );
-            })
+            <>
+              <div className="tfa-saved-head tfa-recent-head">
+                <button
+                  type="button"
+                  className="tfa-head-btn"
+                  onClick={() => toggleSort("name")}
+                >
+                  账号名 {sortArrow("name")}
+                </button>
+                <span>秘钥</span>
+                <span>
+                  动态码{" "}
+                  <span className="tfa-badge">{recentLive.remaining}s</span>
+                </span>
+                <button
+                  type="button"
+                  className="tfa-head-btn"
+                  onClick={() => toggleSort("time")}
+                >
+                  时间 {sortArrow("time")}
+                </button>
+                <span>操作</span>
+              </div>
+              {recentRows.map((row) => {
+                const code = recentLive.codes[row.secret];
+                const isSaved = savedSecrets.has(row.secret);
+                return (
+                  <div
+                    className="tfa-saved-row tfa-recent-row"
+                    key={row.key}
+                  >
+                    <span className="tfa-saved-name">{row.name}</span>
+                    <span className="tfa-saved-secret">
+                      {row.secret}
+                      <button
+                        type="button"
+                        className="tfa-icon-btn"
+                        title="复制秘钥"
+                        onClick={() =>
+                          copyText(`rsecret:${row.key}`, row.secret)
+                        }
+                      >
+                        {copiedKey === `rsecret:${row.key}` ? "✓" : "⧉"}
+                      </button>
+                    </span>
+                    <span className="tfa-saved-code">
+                      <span className="tfa-live-code">
+                        {code ?? "······"}
+                      </span>
+                      <button
+                        type="button"
+                        className="tfa-icon-btn"
+                        title="复制动态码"
+                        disabled={!code}
+                        onClick={() =>
+                          code && copyText(`rcode:${row.key}`, code)
+                        }
+                      >
+                        {copiedKey === `rcode:${row.key}` ? "✓" : "⧉"}
+                      </button>
+                    </span>
+                    <span className="tfa-saved-time">
+                      {formatDateTimeSec(row.at)}
+                    </span>
+                    <span className="tfa-recent-actions">
+                      <button
+                        type="button"
+                        title="重新载入查询"
+                        onClick={() => loadAndScroll(row.secret)}
+                      >
+                        载入
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isSaved}
+                        title="保存到已保存列表"
+                        onClick={() => {
+                          saveEntries([
+                            { secret: row.secret, label: row.label },
+                          ]);
+                        }}
+                      >
+                        {isSaved ? "已保存" : "保存到列表"}
+                      </button>
+                      <button
+                        type="button"
+                        className="tfa-delete"
+                        title="删除这条记录"
+                        onClick={() =>
+                          recentRowsAll.filter(
+                            (r) => r.recentId === row.recentId,
+                          ).length > 1
+                            ? removeRecentSecret(row.recentId, row.secret)
+                            : removeRecentEntry(row.recentId)
+                        }
+                      >
+                        删除
+                      </button>
+                    </span>
+                  </div>
+                );
+              })}
+              <p className="tfa-local-note">
+                近期查询按密钥逐行显示，动态码同样实时刷新；标签里的次数仍按整批查询计数（最多
+                10 次）。
+              </p>
+            </>
           ))}
       </section>
     </>

@@ -433,3 +433,78 @@
   .tfa-saved-time { grid-area: time; text-align: right; }
   .tfa-saved-actions { grid-area: actions; }
 }
+
+/* 搜索行与可排序表头、近期表格 */
+.tfa-search-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+.tfa-search-row input {
+  flex: 1;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 0 12px;
+  font-size: 13px;
+  min-width: 0;
+}
+.tfa-search-row .tfa-io-btn {
+  margin-bottom: 0;
+}
+.tfa-head-btn {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+.tfa-head-btn:hover {
+  color: #2f6df0;
+}
+.tfa-recent-row {
+  grid-template-columns: minmax(110px, 0.9fr) minmax(180px, 1.5fr) 150px 150px 178px;
+}
+.tfa-recent-actions {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+.tfa-recent-actions button {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 7px;
+  font-size: 12px;
+  min-height: 28px;
+  padding: 0 8px;
+  cursor: pointer;
+  color: #3c4a61;
+}
+.tfa-recent-actions button:disabled {
+  color: #15916c;
+  border-color: #bfe6d8;
+  background: #effaf5;
+  cursor: default;
+}
+.tfa-recent-actions .tfa-delete {
+  border: 0;
+  background: transparent;
+  min-height: 28px;
+}
+@media (max-width: 760px) {
+  .tfa-recent-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name actions"
+      "secret secret"
+      "code time";
+  }
+  .tfa-recent-row .tfa-saved-name { grid-area: name; }
+  .tfa-recent-row .tfa-saved-secret { grid-area: secret; }
+  .tfa-recent-row .tfa-saved-code { grid-area: code; }
+  .tfa-recent-row .tfa-saved-time { grid-area: time; text-align: right; }
+  .tfa-recent-row .tfa-recent-actions { grid-area: actions; }
+}
