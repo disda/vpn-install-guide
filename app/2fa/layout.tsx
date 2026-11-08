@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { IconArrowUpRight } from "@/components/icons";
 import "../text/text.css";
 import "./2fa.css";
 
@@ -21,12 +22,12 @@ export default function TwoFaLayout({
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" href="/">
-            <span className="brand-mark">↗</span>连接指南
+            <span className="brand-mark"><IconArrowUpRight size={19} /></span>连接指南
             <span className="brand-divider" />
             <span className="brand-caption">2FA TOOL</span>
           </Link>
           <Link className="header-help" href="/">
-            返回安装指南 ↗
+            返回安装指南 <IconArrowUpRight size={12} />
           </Link>
         </div>
       </header>

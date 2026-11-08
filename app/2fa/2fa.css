@@ -441,15 +441,7 @@
   align-items: center;
   margin-top: 12px;
 }
-.tfa-search-row input {
-  flex: 1;
-  min-height: 36px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  padding: 0 12px;
-  font-size: 13px;
-  min-width: 0;
-}
+
 .tfa-search-row .tfa-io-btn {
   margin-bottom: 0;
 }
@@ -523,4 +515,46 @@
 }
 .tfa-recent-actions {
   gap: 2px;
+}
+
+/* SVG 图标对齐 */
+.tfa-tabs > button[role="tab"],
+.tfa-io-btn,
+.tfa-head-btn,
+.tfa-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.tfa-icon-btn svg,
+.tfa-action-icon svg {
+  display: block;
+}
+.tfa-search-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+.tfa-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+.tfa-search-wrap input {
+  flex: 1;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 0 12px 0 34px;
+  font-size: 13px;
+  min-width: 0;
+}
+.header-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }

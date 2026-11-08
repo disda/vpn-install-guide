@@ -17,6 +17,22 @@ import {
   type TotpEntry,
 } from "@/lib/totp";
 import {
+  IconCheck,
+  IconChevronDown,
+  IconChevronUp,
+  IconChevronsUpDown,
+  IconClock,
+  IconCopy,
+  IconDownload,
+  IconHistory,
+  IconPencil,
+  IconSearch,
+  IconStar,
+  IconStarFilled,
+  IconTrash,
+  IconUpload,
+} from "@/components/icons";
+import {
   EMPTY_TWO_FA_STORE,
   isRealLabel,
   parseTwoFaStore,
@@ -229,9 +245,13 @@ export function TwoFaTool() {
     );
   }
 
-  function sortArrow(by: SortState["by"]) {
-    if (sort.by !== by) return "↕";
-    return sort.dir === 1 ? "↑" : "↓";
+  function sortIcon(by: SortState["by"]) {
+    if (sort.by !== by) return <IconChevronsUpDown size={12} />;
+    return sort.dir === 1 ? (
+      <IconChevronUp size={12} />
+    ) : (
+      <IconChevronDown size={12} />
+    );
   }
 
   function flashCopied(key: string) {
@@ -543,7 +563,7 @@ export function TwoFaTool() {
                         : "复制"}
                     </button>
                   </div>
-                  <span className="tfa-time">◷ {resultCodes.remaining}</span>
+                  <span className="tfa-time"><IconClock size={13} /> {resultCodes.remaining}</span>
                   <div className="tfa-secret-cell">
                     <span className="tfa-secret" title={entry.secret}>
                       {entry.secret}
@@ -576,7 +596,7 @@ export function TwoFaTool() {
             className={activeTab === "saved" ? "active" : ""}
             onClick={() => setActiveTab("saved")}
           >
-            ★ 已保存（{store.saved.length}）
+            <IconStar size={14} /> 已保存（{store.saved.length}）
           </button>
           <button
             type="button"
@@ -585,7 +605,7 @@ export function TwoFaTool() {
             className={activeTab === "recent" ? "active" : ""}
             onClick={() => setActiveTab("recent")}
           >
-            ◷ 近期查询（{recentRowsAll.length}）
+            <IconClock size={14} /> 近期查询（{recentRowsAll.length}）
           </button>
           <span className="tfa-tabs-spacer" />
           {activeTab === "saved" && store.saved.length > 0 && (
@@ -595,14 +615,14 @@ export function TwoFaTool() {
                 className="tfa-io-btn"
                 onClick={() => fileRef.current?.click()}
               >
-                ⬆ 导入
+                <IconUpload size={13} /> 导入
               </button>
               <button
                 type="button"
                 className="tfa-io-btn"
                 onClick={exportSaved}
               >
-                ⬇ 导出
+                <IconDownload size={13} /> 导出
               </button>
             </>
           )}
@@ -620,13 +640,16 @@ export function TwoFaTool() {
         />
         {(store.saved.length > 0 || store.recent.length > 0) && (
           <div className="tfa-search-row">
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="🔍 搜索账号名或秘钥"
-              aria-label="搜索账号名或秘钥"
-            />
+            <span className="tfa-search-wrap">
+              <IconSearch size={15} className="tfa-search-icon" />
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="搜索账号名或秘钥"
+                aria-label="搜索账号名或秘钥"
+              />
+            </span>
             {activeTab === "recent" && store.recent.length > 0 && (
               <button
                 type="button"
@@ -656,7 +679,7 @@ export function TwoFaTool() {
                   className="tfa-head-btn"
                   onClick={() => toggleSort("name")}
                 >
-                  账号名 {sortArrow("name")}
+                  账号名 {sortIcon("name")}
                 </button>
                 <span>秘钥</span>
                 <span>
@@ -668,7 +691,7 @@ export function TwoFaTool() {
                   className="tfa-head-btn"
                   onClick={() => toggleSort("time")}
                 >
-                  保存时间 {sortArrow("time")}
+                  保存时间 {sortIcon("time")}
                 </button>
                 <span>操作</span>
               </div>
@@ -712,7 +735,7 @@ export function TwoFaTool() {
                               setDraftName(item.name);
                             }}
                           >
-                            ✎
+                            <IconPencil size={13} />
                           </button>
                         </>
                       )}
@@ -727,7 +750,7 @@ export function TwoFaTool() {
                           copyText(`secret:${item.id}`, item.secret)
                         }
                       >
-                        {copiedKey === `secret:${item.id}` ? "✓" : "⧉"}
+                        {copiedKey === `secret:${item.id}` ? <IconCheck size={13} /> : <IconCopy size={13} />}
                       </button>
                     </span>
                     <span className="tfa-saved-code">
@@ -743,7 +766,7 @@ export function TwoFaTool() {
                           code && copyText(`savedcode:${item.id}`, code)
                         }
                       >
-                        {copiedKey === `savedcode:${item.id}` ? "✓" : "⧉"}
+                        {copiedKey === `savedcode:${item.id}` ? <IconCheck size={13} /> : <IconCopy size={13} />}
                       </button>
                     </span>
                     <span className="tfa-saved-time">
@@ -757,7 +780,7 @@ export function TwoFaTool() {
                         aria-label="删除"
                         onClick={() => removeSaved(item.id)}
                       >
-                        🗑
+                        <IconTrash size={15} />
                       </button>
                     </span>
                   </div>
@@ -785,7 +808,7 @@ export function TwoFaTool() {
                   className="tfa-head-btn"
                   onClick={() => toggleSort("name")}
                 >
-                  账号名 {sortArrow("name")}
+                  账号名 {sortIcon("name")}
                 </button>
                 <span>秘钥</span>
                 <span>
@@ -797,7 +820,7 @@ export function TwoFaTool() {
                   className="tfa-head-btn"
                   onClick={() => toggleSort("time")}
                 >
-                  时间 {sortArrow("time")}
+                  时间 {sortIcon("time")}
                 </button>
                 <span>操作</span>
               </div>
@@ -820,7 +843,7 @@ export function TwoFaTool() {
                           copyText(`rsecret:${row.key}`, row.secret)
                         }
                       >
-                        {copiedKey === `rsecret:${row.key}` ? "✓" : "⧉"}
+                        {copiedKey === `rsecret:${row.key}` ? <IconCheck size={13} /> : <IconCopy size={13} />}
                       </button>
                     </span>
                     <span className="tfa-saved-code">
@@ -836,7 +859,7 @@ export function TwoFaTool() {
                           code && copyText(`rcode:${row.key}`, code)
                         }
                       >
-                        {copiedKey === `rcode:${row.key}` ? "✓" : "⧉"}
+                        {copiedKey === `rcode:${row.key}` ? <IconCheck size={13} /> : <IconCopy size={13} />}
                       </button>
                     </span>
                     <span className="tfa-saved-time">
@@ -850,7 +873,7 @@ export function TwoFaTool() {
                         aria-label="载入重新查询"
                         onClick={() => loadAndScroll(row.secret)}
                       >
-                        ↺
+                        <IconHistory size={15} />
                       </button>
                       <button
                         type="button"
@@ -868,7 +891,7 @@ export function TwoFaTool() {
                           ]);
                         }}
                       >
-                        {isSaved ? "★" : "☆"}
+                        {isSaved ? <IconStarFilled size={15} /> : <IconStar size={15} />}
                       </button>
                       <button
                         type="button"
@@ -883,7 +906,7 @@ export function TwoFaTool() {
                             : removeRecentEntry(row.recentId)
                         }
                       >
-                        🗑
+                        <IconTrash size={15} />
                       </button>
                     </span>
                   </div>

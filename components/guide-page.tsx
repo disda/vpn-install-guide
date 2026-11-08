@@ -1,4 +1,5 @@
 "use client";
+import { IconArrowUpRight } from "@/components/icons";
 
 import { useState, type KeyboardEvent } from "react";
 import Link from "next/link";
@@ -116,19 +117,19 @@ export function GuidePage({
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" href="/" aria-label="连接指南首页">
-            <span className="brand-mark">↗</span>连接指南
+            <span className="brand-mark"><IconArrowUpRight size={19} /></span>连接指南
             <span className="brand-divider" />
             <span className="brand-caption">SETUP GUIDE</span>
           </Link>
           <div className="header-actions">
             <Link className="header-help" href="/2fa">
-              2FA 验证 ↗
+              2FA 验证 <IconArrowUpRight size={12} />
             </Link>
             <Link className="header-help" href="/text">
-              长文本分享 ↗
+              长文本分享 <IconArrowUpRight size={12} />
             </Link>
             <a className="header-help" href="#faq">
-              遇到问题？<span aria-hidden="true">↗</span>
+              遇到问题？<IconArrowUpRight size={12} />
             </a>
           </div>
         </div>
