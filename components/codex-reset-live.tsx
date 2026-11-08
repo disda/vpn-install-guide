@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 // 数据来源：AIHOT 公开 API（/api/v1/codex-resets/recent），匿名只读。
 // 对方每 10 分钟采集一次，本组件按同一节奏刷新。
-const API_URL = "https://aihot.news/api/v1/codex-resets/recent";
+const API_URL = "/api/codex-resets";
 const SOURCE_URL = "https://aihot.news/codex-reset";
 
 interface ResetPost {
