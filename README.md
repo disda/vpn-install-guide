@@ -106,15 +106,3 @@ npx wrangler d1 migrations apply TEXT_SHARE_DB --remote
 ```
 
 接口：`POST /api/text` 创建，`GET /api/text/[id]` 读取，`DELETE /api/text/[id]` 删除。请求和响应不记录原文；应用不提供凭证提取或会话获取教程。
-
-## ChatGPT 套餐与额度查询
-
-入口为 `/chatgpt`，首页导航也可进入。用户粘贴自己账号的 ChatGPT Session JSON 后，邮箱、套餐、登录会话过期与 accessToken 过期时间先在浏览器本地解析；点击查询后，浏览器只把 accessToken 与账号 ID 发给 `POST /api/chatgpt/query`，服务端不保存、不记录凭证与结果，仅在本次请求内转发给 chatgpt.com 的三个只读接口：
-
-- `GET /backend-api/accounts/check/v4-2023-04-27`：套餐与订阅到期（entitlement.expires_at），选账号规则与 Cockpit Tools 一致（按账号 ID、默认账号、首个非 Free、首条依次回退）。
-- `GET /backend-api/subscriptions?account_id=...`：主接口没给到期时补查 active_until。
-- `GET /backend-api/wham/usage`：Codex 额度，短/长窗口的已用百分比、重置时间与可用重置次数。
-
-查询接口要求同源 JSON 请求，只接受 accessToken、accountId、timezoneOffsetMin 三个字段，并复用长文本分享的限流绑定（每分钟 10 次/IP）。页面与接口均 no-store、noindex、no-referrer。Session 等同于登录凭证，页面明确提示只能查自己的账号、不要把凭证发给任何人。
-
-注意：实测 ChatGPT 会拦截 Cloudflare Workers 出口的请求（同一有效凭证经服务器查询返回 403 并回 HTML 拦截页、从普通网络直查为 200，补全浏览器请求头后仍为 403，属其边缘防护层按来源网络拦截，Workers 侧无可配置的出口）；浏览器从本站直连 chatgpt.com 也会被其 CORS 拒绝。403 的错误文案已如实说明这一拦截、不再误报凭证过期。页面底部曾短暂上过「浏览器内查询」书签脚本方案，2026-11-08 按用户要求下线。
