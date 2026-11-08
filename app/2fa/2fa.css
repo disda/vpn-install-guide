@@ -252,3 +252,184 @@
   background: #effaf5;
   cursor: default;
 }
+
+/* 查询面板动作行 */
+.tfa-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tfa-panel-actions .secondary-button {
+  background: #fff;
+  color: #1d2b43;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.tfa-panel-msg {
+  font-size: 12px;
+  color: #15916c;
+}
+
+/* 已保存/近期查询 标签页 */
+.tfa-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0;
+  flex-wrap: wrap;
+}
+.tfa-tabs > button[role="tab"] {
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  padding: 8px 12px 10px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tfa-tabs > button[role="tab"].active {
+  color: #2f6df0;
+  border-bottom-color: #2f6df0;
+}
+.tfa-tabs-spacer {
+  flex: 1;
+}
+.tfa-io-btn {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  font-size: 12px;
+  min-height: 30px;
+  padding: 0 12px;
+  cursor: pointer;
+  color: #3c4a61;
+  margin-bottom: 6px;
+}
+.tfa-tabs .tfa-clear {
+  margin-left: 0;
+  margin-bottom: 6px;
+}
+.tfa-store-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.tfa-io-msg {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #15916c;
+}
+.tfa-empty {
+  margin: 14px 0 4px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+/* 已保存实时表格 */
+.tfa-saved-head,
+.tfa-saved-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.9fr) minmax(180px, 1.5fr) 190px 130px 52px;
+  gap: 12px;
+  align-items: center;
+}
+.tfa-saved-head {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 12px 2px 8px;
+}
+.tfa-saved-row {
+  padding: 9px 2px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.tfa-saved-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1d2b43;
+  min-width: 0;
+  word-break: break-all;
+}
+.tfa-saved-secret {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: #3c4a61;
+  word-break: break-all;
+}
+.tfa-saved-code {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.tfa-live-code {
+  font-family: ui-monospace, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #2f6df0;
+  min-width: 76px;
+}
+.tfa-badge {
+  font-size: 11px;
+  color: #e05f4e;
+  background: #fdecea;
+  border-radius: 999px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+.tfa-saved-time {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tfa-icon-btn {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 3px 5px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.tfa-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: wait;
+}
+.tfa-delete {
+  border: 0;
+  background: transparent;
+  color: var(--danger, #c2413a);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 3px 4px;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .tfa-saved-head {
+    display: none;
+  }
+  .tfa-saved-row {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name actions"
+      "secret secret"
+      "code time";
+    row-gap: 6px;
+  }
+  .tfa-saved-name { grid-area: name; }
+  .tfa-saved-secret { grid-area: secret; }
+  .tfa-saved-code { grid-area: code; }
+  .tfa-saved-time { grid-area: time; text-align: right; }
+  .tfa-saved-actions { grid-area: actions; }
+}
