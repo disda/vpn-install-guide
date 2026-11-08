@@ -1,9 +1,31 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import Link from "next/link";
 import type { TextShare } from "@/lib/text-shares";
 import { extractSharedEmail } from "@/lib/text-share-insights";
+import {
+  loadShareNote,
+  saveShareNote,
+  SHARE_NOTE_MAX_LENGTH,
+} from "@/lib/text-share-notes";
+
+const SHARE_NOTE_EVENT = "guide-share-note-changed";
+
+function subscribeShareNote(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(SHARE_NOTE_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(SHARE_NOTE_EVENT, onStoreChange);
+  };
+}
 
 export function TextShareViewer({ share }: { share: TextShare }) {
   const [message, setMessage] = useState("");
@@ -11,6 +33,38 @@ export function TextShareViewer({ share }: { share: TextShare }) {
   const [deleting, setDeleting] = useState(false);
   const content = useRef<HTMLTextAreaElement>(null);
   const accountEmail = useMemo(() => extractSharedEmail(share.text), [share.text]);
+  const getNoteSnapshot = useCallback(
+    () => loadShareNote(window.localStorage, share.id),
+    [share.id],
+  );
+  const note = useSyncExternalStore(
+    subscribeShareNote,
+    getNoteSnapshot,
+    () => "",
+  );
+
+  function updateNote(value: string) {
+    saveShareNote(window.localStorage, share.id, value);
+    window.dispatchEvent(new Event(SHARE_NOTE_EVENT));
+  }
+
+  const noteEditor = (
+    <div className="text-note-row">
+      <label htmlFor="share-note">备注</label>
+      <input
+        id="share-note"
+        type="text"
+        value={note}
+        maxLength={SHARE_NOTE_MAX_LENGTH}
+        placeholder="给这段分享加个备注"
+        onChange={(event) => updateNote(event.target.value)}
+        autoComplete="off"
+      />
+      <span className="text-note-hint">
+        {note ? "已保存在本机" : "仅保存在本机浏览器"}
+      </span>
+    </div>
+  );
 
   async function copyEmail() {
     if (!accountEmail) return;
@@ -145,20 +199,25 @@ export function TextShareViewer({ share }: { share: TextShare }) {
         <p className="text-view-message" role="status">
           {message || "点击下方文本也可自行选择复制。"}
         </p>
-        {accountEmail && (
+        {accountEmail ? (
           <div className="text-email-banner">
-            <div>
-              <span className="text-email-label">账号邮箱</span>
-              <span className="text-email-value">{accountEmail}</span>
+            <div className="text-email-row">
+              <div>
+                <span className="text-email-label">账号邮箱</span>
+                <span className="text-email-value">{accountEmail}</span>
+              </div>
+              <button
+                type="button"
+                className="text-secondary-button"
+                onClick={copyEmail}
+              >
+                复制邮箱
+              </button>
             </div>
-            <button
-              type="button"
-              className="text-secondary-button"
-              onClick={copyEmail}
-            >
-              复制邮箱
-            </button>
+            {noteEditor}
           </div>
+        ) : (
+          <div className="text-note-banner">{noteEditor}</div>
         )}
         <label className="text-area-label" htmlFor="shared-content">
           分享的原文
