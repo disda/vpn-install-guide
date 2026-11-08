@@ -1,14 +1,26 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { TextShare } from "@/lib/text-shares";
+import { extractSharedEmail } from "@/lib/text-share-insights";
 
 export function TextShareViewer({ share }: { share: TextShare }) {
   const [message, setMessage] = useState("");
   const [deleted, setDeleted] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const content = useRef<HTMLTextAreaElement>(null);
+  const accountEmail = useMemo(() => extractSharedEmail(share.text), [share.text]);
+
+  async function copyEmail() {
+    if (!accountEmail) return;
+    try {
+      await navigator.clipboard.writeText(accountEmail);
+      setMessage("邮箱已复制。");
+    } catch {
+      setMessage("复制失败，请长按邮箱手动复制。");
+    }
+  }
   const expiration = new Intl.DateTimeFormat("zh-CN", {
     timeZone: "Asia/Shanghai",
     month: "2-digit",
@@ -133,6 +145,21 @@ export function TextShareViewer({ share }: { share: TextShare }) {
         <p className="text-view-message" role="status">
           {message || "点击下方文本也可自行选择复制。"}
         </p>
+        {accountEmail && (
+          <div className="text-email-banner">
+            <div>
+              <span className="text-email-label">账号邮箱</span>
+              <span className="text-email-value">{accountEmail}</span>
+            </div>
+            <button
+              type="button"
+              className="text-secondary-button"
+              onClick={copyEmail}
+            >
+              复制邮箱
+            </button>
+          </div>
+        )}
         <label className="text-area-label" htmlFor="shared-content">
           分享的原文
         </label>
