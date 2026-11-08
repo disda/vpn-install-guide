@@ -588,17 +588,6 @@
 .tfa-recent-actions {
   gap: 12px;
 }
-.tfa-key-tile {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  background: #e8eefc;
-  color: #2f6df0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-}
 .tfa-live-code {
   letter-spacing: 1.5px;
 }

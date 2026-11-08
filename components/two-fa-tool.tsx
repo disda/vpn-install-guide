@@ -25,7 +25,6 @@ import {
   Copy,
   Download,
   History,
-  KeyRound,
   Pencil,
   Search,
   Star,
@@ -725,9 +724,6 @@ export function TwoFaTool() {
                         </span>
                       ) : (
                         <>
-                          <span className="tfa-key-tile">
-                            <KeyRound size={16} />
-                          </span>
                           {item.name}
                           <button
                             type="button"
@@ -836,9 +832,6 @@ export function TwoFaTool() {
                     key={row.key}
                   >
                     <span className="tfa-saved-name">
-                      <span className="tfa-key-tile">
-                        <KeyRound size={16} />
-                      </span>
                       {row.name}
                     </span>
                     <span className="tfa-saved-secret">
