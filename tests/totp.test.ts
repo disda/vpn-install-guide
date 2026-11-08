@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   base32Decode,
   detectBareSecrets,
+  extractTotpEntries,
   extractTotpSecrets,
   formatCode,
   generateTotp,
@@ -88,4 +89,54 @@ test("工具页提取：完整格式优先取第 3 段，裸密钥逐行取", ()
 test("验证码格式化与密钥脱敏", () => {
   assert.equal(formatCode("287082"), "287 082");
   assert.equal(maskSecret("JBSWY3DPEHPK3PXP"), "JBSW…3PXP");
+});
+
+import {
+  parseTwoFaStore,
+  pushRecent,
+  upsertSaved,
+  EMPTY_TWO_FA_STORE,
+  type RecentEntry,
+  type SavedEntry,
+} from "../lib/two-fa-storage";
+
+test("2FA 本地存储：解析容错、近期去重置顶、保存同密钥不重复", () => {
+  assert.deepEqual(parseTwoFaStore(null), EMPTY_TWO_FA_STORE);
+  assert.deepEqual(parseTwoFaStore("{oops"), EMPTY_TWO_FA_STORE);
+  assert.deepEqual(parseTwoFaStore('{"saved":[{"bad":1}],"recent":"x"}'), {
+    saved: [],
+    recent: [],
+  });
+  const r = (id: string, secrets: string[]): RecentEntry => ({
+    id,
+    secrets,
+    labels: secrets,
+    at: 1,
+  });
+  let recent = pushRecent([], r("a", ["S1"]));
+  recent = pushRecent(recent, r("b", ["S2"]));
+  recent = pushRecent(recent, r("c", ["S1"]));
+  assert.deepEqual(
+    recent.map((item) => item.id),
+    ["c", "b"],
+  );
+  const s = (id: string, secret: string): SavedEntry => ({
+    id,
+    name: id,
+    secret,
+    createdAt: 1,
+  });
+  let saved = upsertSaved([], s("a", "S1"));
+  saved = upsertSaved(saved, s("b", "S1"));
+  assert.equal(saved.length, 1);
+  saved = upsertSaved(saved, s("c", "S2"));
+  assert.equal(saved.length, 2);
+});
+
+test("工具页条目：完整格式带出邮箱标签，裸密钥无标签", () => {
+  const entries = extractTotpEntries(
+    "1001|passw0rd|JBSWY3DPEHPK3PXP|a@b.com|mailpass\nGEZDGNBVGY3TQOJQ",
+  );
+  assert.equal(entries[0].label, "a@b.com");
+  assert.equal(entries[1].label, "");
 });

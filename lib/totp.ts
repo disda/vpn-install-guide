@@ -100,19 +100,26 @@ export function detectBareSecrets(text: string): string[] {
   return [...seen];
 }
 
+export interface TotpEntry {
+  secret: string;
+  /** 账号标签：完整格式时取邮箱字段、否则取首段（UID）；裸密钥为空。 */
+  label: string;
+}
+
 /**
  * 2FA 工具页的输入提取：一行一个条目。
  * - 整行是裸密钥：直接用。
  * - 「UID|密码|2FA|邮箱|邮箱密码...」完整格式：优先取第 3 段（2FA 位置），
  *   该段不合法时退回取行内第一个合法的段。
- * 返回去重后的归一化密钥列表，最多 50 个。
+ * 返回去重后的条目列表，最多 50 个。
  */
-export function extractTotpSecrets(text: string): string[] {
-  const seen = new Set<string>();
+export function extractTotpEntries(text: string): TotpEntry[] {
+  const seen = new Map<string, TotpEntry>();
   for (const line of text.split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed) continue;
     let found: string | null = null;
+    let label = "";
     if (trimmed.includes("|")) {
       const fields = trimmed.split("|");
       const ordered = [fields[2], ...fields];
@@ -121,13 +128,21 @@ export function extractTotpSecrets(text: string): string[] {
         found = qualifySecret(field);
         if (found) break;
       }
+      if (found) {
+        const emailField = fields.find((field) => field.includes("@"));
+        label = (emailField ?? fields[0] ?? "").trim();
+      }
     } else {
       found = qualifySecret(trimmed);
     }
-    if (found) seen.add(found);
+    if (found && !seen.has(found)) seen.set(found, { secret: found, label });
     if (seen.size >= 50) break;
   }
-  return [...seen];
+  return [...seen.values()];
+}
+
+export function extractTotpSecrets(text: string): string[] {
+  return extractTotpEntries(text).map((entry) => entry.secret);
 }
 
 export function formatCode(code: string): string {
