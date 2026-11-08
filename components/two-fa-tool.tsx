@@ -752,11 +752,12 @@ export function TwoFaTool() {
                     <span className="tfa-saved-actions">
                       <button
                         type="button"
-                        className="tfa-delete"
+                        className="tfa-icon-btn tfa-action-icon tfa-action-delete"
                         title="删除"
+                        aria-label="删除"
                         onClick={() => removeSaved(item.id)}
                       >
-                        删除
+                        🗑
                       </button>
                     </span>
                   </div>
@@ -844,27 +845,36 @@ export function TwoFaTool() {
                     <span className="tfa-recent-actions">
                       <button
                         type="button"
-                        title="重新载入查询"
+                        className="tfa-icon-btn tfa-action-icon"
+                        title="载入重新查询"
+                        aria-label="载入重新查询"
                         onClick={() => loadAndScroll(row.secret)}
                       >
-                        载入
+                        ↺
                       </button>
                       <button
                         type="button"
+                        className={
+                          isSaved
+                            ? "tfa-icon-btn tfa-action-icon is-saved"
+                            : "tfa-icon-btn tfa-action-icon"
+                        }
                         disabled={isSaved}
-                        title="保存到已保存列表"
+                        title={isSaved ? "已保存" : "保存到列表"}
+                        aria-label={isSaved ? "已保存" : "保存到列表"}
                         onClick={() => {
                           saveEntries([
                             { secret: row.secret, label: row.label },
                           ]);
                         }}
                       >
-                        {isSaved ? "已保存" : "保存到列表"}
+                        {isSaved ? "★" : "☆"}
                       </button>
                       <button
                         type="button"
-                        className="tfa-delete"
+                        className="tfa-icon-btn tfa-action-icon tfa-action-delete"
                         title="删除这条记录"
+                        aria-label="删除这条记录"
                         onClick={() =>
                           recentRowsAll.filter(
                             (r) => r.recentId === row.recentId,
@@ -873,7 +883,7 @@ export function TwoFaTool() {
                             : removeRecentEntry(row.recentId)
                         }
                       >
-                        删除
+                        🗑
                       </button>
                     </span>
                   </div>
