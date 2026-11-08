@@ -57,8 +57,8 @@
 }
 .tfa-copy {
   border: 0;
-  background: #dff5ec;
-  color: #15916c;
+  background: #e8eefc;
+  color: #2f6df0;
   font-size: 12px;
   padding: 0 14px;
   cursor: pointer;
@@ -70,7 +70,7 @@
 }
 .tfa-time {
   font-size: 14px;
-  color: #e05f4e;
+  color: var(--muted);
   white-space: nowrap;
 }
 .tfa-secret {
@@ -156,9 +156,9 @@
   white-space: nowrap;
 }
 .tfa-save:disabled {
-  color: #15916c;
-  border-color: #bfe6d8;
-  background: #effaf5;
+  color: #2f6df0;
+  border-color: #c7d6fb;
+  background: #eef3fe;
   cursor: default;
 }
 .tfa-store-card {
@@ -247,9 +247,9 @@
 }
 
 .tfa-store-actions button:disabled {
-  color: #15916c;
-  border-color: #bfe6d8;
-  background: #effaf5;
+  color: #2f6df0;
+  border-color: #c7d6fb;
+  background: #eef3fe;
   cursor: default;
 }
 
@@ -269,7 +269,7 @@
 }
 .tfa-panel-msg {
   font-size: 12px;
-  color: #15916c;
+  color: #2f6df0;
 }
 
 /* 已保存/近期查询 标签页 */
@@ -322,7 +322,7 @@
 .tfa-io-msg {
   margin: 8px 0 0;
   font-size: 12px;
-  color: #15916c;
+  color: #2f6df0;
 }
 .tfa-empty {
   margin: 14px 0 4px;
@@ -381,8 +381,8 @@
 }
 .tfa-badge {
   font-size: 11px;
-  color: #e05f4e;
-  background: #fdecea;
+  color: #2f6df0;
+  background: #e8eefc;
   border-radius: 999px;
   padding: 2px 7px;
   white-space: nowrap;
@@ -476,9 +476,9 @@
   color: #3c4a61;
 }
 .tfa-recent-actions button:disabled {
-  color: #15916c;
-  border-color: #bfe6d8;
-  background: #effaf5;
+  color: #2f6df0;
+  border-color: #c7d6fb;
+  background: #eef3fe;
   cursor: default;
 }
 .tfa-recent-actions .tfa-delete {
@@ -507,7 +507,7 @@
   line-height: 1;
 }
 .tfa-action-icon.is-saved {
-  color: #15916c;
+  color: #2f6df0;
   opacity: 1;
 }
 .tfa-action-delete {
@@ -557,4 +557,25 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+.tfa-icon-btn,
+.tfa-action-icon {
+  color: #64748b;
+}
+.tfa-icon-btn:hover,
+.tfa-action-icon:hover {
+  color: #2f6df0;
+  background: #eef3fe;
+}
+.tfa-action-delete,
+.tfa-action-delete:hover {
+  color: #c2413a;
+}
+.tfa-action-delete:hover {
+  background: #fdf0ef;
+}
+.tfa-action-icon.is-saved:hover {
+  color: #2f6df0;
+  background: transparent;
 }
