@@ -56,11 +56,18 @@ h2,
 h3 {
   margin: 0;
 }
-svg {
+.lucide,
+.platform-tab > svg {
   display: block;
-  width: 25px;
-  height: 25px;
   flex-shrink: 0;
+}
+.lucide {
+  stroke-width: 2.25;
+}
+.header-help > svg,
+.tab-check > svg,
+.source-row > a > svg {
+  stroke-width: 2.5;
 }
 .skip-link {
   position: fixed;
@@ -104,8 +111,7 @@ svg {
   height: 32px;
   border-radius: 10px;
   color: white;
-  font-size: 27px;
-  line-height: 1;
+  flex-shrink: 0;
 }
 .brand-divider {
   height: 17px;
@@ -120,6 +126,10 @@ svg {
   letter-spacing: 1.8px;
 }
 .header-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
   font-size: 13px;
   color: var(--muted);
 }
@@ -127,9 +137,6 @@ svg {
   display: flex;
   align-items: center;
   gap: 22px;
-}
-.header-help span {
-  margin-left: 9px;
 }
 .header-help:hover {
   color: var(--blue);
@@ -191,8 +198,7 @@ h1 > span {
   color: var(--blue);
   font-weight: 500;
 }
-.journey i {
-  font-style: normal;
+.journey > svg {
   color: #c3ccdb;
 }
 .section-heading {
@@ -231,7 +237,10 @@ h1 > span {
     border-color 0.15s;
 }
 .platform-tab > svg {
-  color: #8793a7;
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.75;
+  color: var(--muted);
 }
 .platform-tab strong {
   display: block;
@@ -258,11 +267,10 @@ h1 > span {
   border-color: #8eabf5;
 }
 .tab-check {
-  font-size: 11px;
+  flex: 0 0 14px;
   color: var(--blue);
   margin-left: auto;
   align-self: flex-start;
-  line-height: 18px;
 }
 .guide-panel {
   outline-offset: 8px;
@@ -384,10 +392,6 @@ h1 > span {
 .primary-button:hover {
   background: var(--blue-dark);
 }
-.primary-button > span:first-child {
-  font-size: 18px;
-  line-height: 1;
-}
 .button-platform {
   border-left: 1px solid #ffffff40;
   padding-left: 12px;
@@ -412,6 +416,11 @@ h1 > span {
   padding: 13px 0;
   font-size: 11px;
   color: #8894a6;
+}
+.source-row > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .source-row > a:hover {
   color: var(--blue);
@@ -556,13 +565,10 @@ h1 > span {
 .faq summary::-webkit-details-marker {
   display: none;
 }
-.faq summary > span {
-  font-size: 20px;
-  color: #8996aa;
-  font-weight: 400;
-  line-height: 1;
+.faq summary > svg {
+  color: var(--muted);
 }
-.faq details[open] summary > span {
+.faq details[open] summary > svg {
   transform: rotate(45deg);
 }
 .faq details p {
@@ -581,7 +587,7 @@ h1 > span {
   color: #8996a8;
   font-size: 12px;
 }
-.finish-note > span {
+.finish-note > svg {
   color: #64a88c;
 }
 footer {
@@ -621,8 +627,9 @@ footer {
     padding: 16px 13px;
   }
   .platform-tab > svg {
-    width: 21px;
-    height: 21px;
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
   }
   .platform-tab strong {
     font-size: 12px;
@@ -656,6 +663,9 @@ footer {
   .brand-mark {
     width: 29px;
     height: 29px;
+  }
+  .header-actions {
+    gap: 14px;
   }
   .header-help {
     font-size: 11px;
@@ -829,5 +839,22 @@ footer {
   }
   * {
     transition: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .guide-header .header-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding-block: 14px;
+  }
+  .guide-header .header-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 12px;
+  }
+  .guide-header .header-help {
+    justify-self: start;
   }
 }

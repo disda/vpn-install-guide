@@ -22,12 +22,12 @@ export default function CodexResetLayout({
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" href="/">
-            <span className="brand-mark"><ArrowUpRight size={16} /></span>连接指南
+            <span className="brand-mark"><ArrowUpRight size={18} aria-hidden="true" /></span>连接指南
             <span className="brand-divider" />
             <span className="brand-caption">CODEX RESET</span>
           </Link>
           <Link className="header-help" href="/">
-            返回安装指南 <ArrowUpRight size={16} />
+            返回安装指南 <ArrowUpRight size={14} aria-hidden="true" />
           </Link>
         </div>
       </header>

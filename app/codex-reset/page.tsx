@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "lucide-react";
 import { CodexResetLive } from "@/components/codex-reset-live";
 import { CodexResetWindow } from "@/components/codex-reset-window";
 
@@ -74,7 +75,7 @@ export default function CodexResetPage() {
             <strong>AIHOT · Codex 额度重置监控</strong>
             <small>持续跟踪官方发帖，含重置日历与原帖链接，每 10 分钟更新</small>
           </span>
-          <span aria-hidden="true">↗</span>
+          <ArrowUpRight size={16} aria-hidden="true" />
         </a>
         <a
           className="cr-source"
@@ -86,7 +87,7 @@ export default function CodexResetPage() {
             <strong>Tibo（@thsottiaux）· X</strong>
             <small>OpenAI Codex 负责人，重置与发卡多由他发帖确认</small>
           </span>
-          <span aria-hidden="true">↗</span>
+          <ArrowUpRight size={16} aria-hidden="true" />
         </a>
       </section>
     </>

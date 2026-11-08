@@ -245,11 +245,11 @@ export function TwoFaTool() {
   }
 
   function sortIcon(by: SortState["by"]) {
-    if (sort.by !== by) return <ArrowUpDown size={16} />;
+    if (sort.by !== by) return <ArrowUpDown size={14} aria-hidden="true" />;
     return sort.dir === 1 ? (
-      <ArrowUp size={16} />
+      <ArrowUp size={14} aria-hidden="true" />
     ) : (
-      <ArrowDown size={16} />
+      <ArrowDown size={14} aria-hidden="true" />
     );
   }
 
@@ -562,7 +562,7 @@ export function TwoFaTool() {
                         : "复制"}
                     </button>
                   </div>
-                  <span className="tfa-time"><Clock size={16} /> {resultCodes.remaining}</span>
+                  <span className="tfa-time"><Clock size={14} aria-hidden="true" /> {resultCodes.remaining}</span>
                   <div className="tfa-secret-cell">
                     <span className="tfa-secret" title={entry.secret}>
                       {entry.secret}
@@ -595,7 +595,7 @@ export function TwoFaTool() {
             className={activeTab === "saved" ? "active" : ""}
             onClick={() => setActiveTab("saved")}
           >
-            <Star size={16} /> 已保存（{store.saved.length}）
+            <Star size={16} aria-hidden="true" /> 已保存（{store.saved.length}）
           </button>
           <button
             type="button"
@@ -604,7 +604,7 @@ export function TwoFaTool() {
             className={activeTab === "recent" ? "active" : ""}
             onClick={() => setActiveTab("recent")}
           >
-            <Clock size={16} /> 近期查询（{recentRowsAll.length}）
+            <Clock size={16} aria-hidden="true" /> 近期查询（{recentRowsAll.length}）
           </button>
           <span className="tfa-tabs-spacer" />
           {activeTab === "saved" && store.saved.length > 0 && (
@@ -614,14 +614,14 @@ export function TwoFaTool() {
                 className="tfa-io-btn"
                 onClick={() => fileRef.current?.click()}
               >
-                <Upload size={16} /> 导入
+                <Upload size={16} aria-hidden="true" /> 导入
               </button>
               <button
                 type="button"
                 className="tfa-io-btn"
                 onClick={exportSaved}
               >
-                <Download size={16} /> 导出
+                <Download size={16} aria-hidden="true" /> 导出
               </button>
             </>
           )}
@@ -640,7 +640,7 @@ export function TwoFaTool() {
         {(store.saved.length > 0 || store.recent.length > 0) && (
           <div className="tfa-search-row">
             <span className="tfa-search-wrap">
-              <Search size={16} className="tfa-search-icon" />
+              <Search size={16} aria-hidden="true" className="tfa-search-icon" />
               <input
                 type="search"
                 value={search}
@@ -729,12 +729,13 @@ export function TwoFaTool() {
                             type="button"
                             className="tfa-icon-btn"
                             title="改名"
+                            aria-label="改名"
                             onClick={() => {
                               setEditingId(item.id);
                               setDraftName(item.name);
                             }}
                           >
-                            <Pencil size={16} />
+                            <Pencil size={16} aria-hidden="true" />
                           </button>
                         </>
                       )}
@@ -745,11 +746,12 @@ export function TwoFaTool() {
                         type="button"
                         className="tfa-icon-btn"
                         title="复制秘钥"
+                        aria-label="复制秘钥"
                         onClick={() =>
                           copyText(`secret:${item.id}`, item.secret)
                         }
                       >
-                        {copiedKey === `secret:${item.id}` ? <Check size={16} /> : <Copy size={16} />}
+                        {copiedKey === `secret:${item.id}` ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
                       </button>
                     </span>
                     <span className="tfa-saved-code">
@@ -760,12 +762,13 @@ export function TwoFaTool() {
                         type="button"
                         className="tfa-icon-btn"
                         title="复制动态码"
+                        aria-label="复制动态码"
                         disabled={!code}
                         onClick={() =>
                           code && copyText(`savedcode:${item.id}`, code)
                         }
                       >
-                        {copiedKey === `savedcode:${item.id}` ? <Check size={16} /> : <Copy size={16} />}
+                        {copiedKey === `savedcode:${item.id}` ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
                       </button>
                     </span>
                     <span className="tfa-saved-time">
@@ -774,12 +777,12 @@ export function TwoFaTool() {
                     <span className="tfa-saved-actions">
                       <button
                         type="button"
-                        className="tfa-icon-btn tfa-action-icon tfa-action-delete"
+                        className="tfa-icon-btn tfa-action-delete"
                         title="删除"
                         aria-label="删除"
                         onClick={() => removeSaved(item.id)}
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={16} aria-hidden="true" />
                       </button>
                     </span>
                   </div>
@@ -840,11 +843,12 @@ export function TwoFaTool() {
                         type="button"
                         className="tfa-icon-btn"
                         title="复制秘钥"
+                        aria-label="复制秘钥"
                         onClick={() =>
                           copyText(`rsecret:${row.key}`, row.secret)
                         }
                       >
-                        {copiedKey === `rsecret:${row.key}` ? <Check size={16} /> : <Copy size={16} />}
+                        {copiedKey === `rsecret:${row.key}` ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
                       </button>
                     </span>
                     <span className="tfa-saved-code">
@@ -855,12 +859,13 @@ export function TwoFaTool() {
                         type="button"
                         className="tfa-icon-btn"
                         title="复制动态码"
+                        aria-label="复制动态码"
                         disabled={!code}
                         onClick={() =>
                           code && copyText(`rcode:${row.key}`, code)
                         }
                       >
-                        {copiedKey === `rcode:${row.key}` ? <Check size={16} /> : <Copy size={16} />}
+                        {copiedKey === `rcode:${row.key}` ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
                       </button>
                     </span>
                     <span className="tfa-saved-time">
@@ -869,19 +874,19 @@ export function TwoFaTool() {
                     <span className="tfa-recent-actions">
                       <button
                         type="button"
-                        className="tfa-icon-btn tfa-action-icon"
+                        className="tfa-icon-btn"
                         title="载入重新查询"
                         aria-label="载入重新查询"
                         onClick={() => loadAndScroll(row.secret)}
                       >
-                        <History size={16} />
+                        <History size={16} aria-hidden="true" />
                       </button>
                       <button
                         type="button"
                         className={
                           isSaved
-                            ? "tfa-icon-btn tfa-action-icon is-saved"
-                            : "tfa-icon-btn tfa-action-icon"
+                            ? "tfa-icon-btn is-saved"
+                            : "tfa-icon-btn"
                         }
                         disabled={isSaved}
                         title={isSaved ? "已保存" : "保存到列表"}
@@ -892,11 +897,11 @@ export function TwoFaTool() {
                           ]);
                         }}
                       >
-                        {isSaved ? <Star size={16} fill="currentColor" /> : <Star size={16} />}
+                        <Star size={16} aria-hidden="true" fill={isSaved ? "currentColor" : "none"} />
                       </button>
                       <button
                         type="button"
-                        className="tfa-icon-btn tfa-action-icon tfa-action-delete"
+                        className="tfa-icon-btn tfa-action-delete"
                         title="删除这条记录"
                         aria-label="删除这条记录"
                         onClick={() =>
@@ -907,7 +912,7 @@ export function TwoFaTool() {
                             : removeRecentEntry(row.recentId)
                         }
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={16} aria-hidden="true" />
                       </button>
                     </span>
                   </div>

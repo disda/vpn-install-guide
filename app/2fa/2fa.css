@@ -393,29 +393,37 @@
   white-space: nowrap;
 }
 .tfa-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  padding: 0;
   border: 0;
+  border-radius: 6px;
   background: transparent;
   color: var(--muted);
-  cursor: pointer;
-  font-size: 13px;
-  padding: 3px 5px;
-  border-radius: 6px;
-  flex-shrink: 0;
+}
+.tfa-icon-btn:hover:not(:disabled) {
+  color: var(--blue);
+  background: var(--blue-soft);
 }
 .tfa-icon-btn:disabled {
   opacity: 0.4;
-  cursor: wait;
+  cursor: default;
 }
-.tfa-delete {
-  border: 0;
-  background: transparent;
-  color: var(--danger, #c2413a);
-  font-size: 12px;
-  cursor: pointer;
-  padding: 3px 4px;
-  white-space: nowrap;
+.tfa-icon-btn.is-saved {
+  color: var(--blue);
+  opacity: 1;
 }
-@media (max-width: 760px) {
+.tfa-action-delete {
+  color: #c2413a;
+}
+.tfa-action-delete:hover:not(:disabled) {
+  color: #c2413a;
+  background: #fdf0ef;
+}
+@media (max-width: 800px) {
   .tfa-saved-head {
     display: none;
   }
@@ -457,36 +465,15 @@
 .tfa-head-btn:hover {
   color: #2f6df0;
 }
+.tfa-recent-head,
 .tfa-recent-row {
   grid-template-columns: minmax(110px, 0.9fr) minmax(180px, 1.5fr) 150px 150px 118px;
 }
 .tfa-recent-actions {
   display: flex;
-  gap: 6px;
-  white-space: nowrap;
+  gap: 4px;
 }
-.tfa-recent-actions button {
-  border: 1px solid var(--line);
-  background: #fff;
-  border-radius: 7px;
-  font-size: 12px;
-  min-height: 28px;
-  padding: 0 8px;
-  cursor: pointer;
-  color: #3c4a61;
-}
-.tfa-recent-actions button:disabled {
-  color: #2f6df0;
-  border-color: #c7d6fb;
-  background: #eef3fe;
-  cursor: default;
-}
-.tfa-recent-actions .tfa-delete {
-  border: 0;
-  background: transparent;
-  min-height: 28px;
-}
-@media (max-width: 760px) {
+@media (max-width: 800px) {
   .tfa-recent-row {
     grid-template-columns: 1fr auto;
     grid-template-areas:
@@ -501,23 +488,6 @@
   .tfa-recent-row .tfa-recent-actions { grid-area: actions; }
 }
 
-.tfa-action-icon {
-  font-size: 16px;
-  padding: 6px 8px;
-  line-height: 1;
-}
-.tfa-action-icon.is-saved {
-  color: #2f6df0;
-  opacity: 1;
-}
-.tfa-action-delete {
-  color: #c2413a;
-}
-.tfa-recent-actions {
-  gap: 2px;
-}
-
-/* SVG 图标对齐 */
 .tfa-tabs > button[role="tab"],
 .tfa-io-btn,
 .tfa-head-btn,
@@ -526,9 +496,9 @@
   align-items: center;
   gap: 5px;
 }
-.tfa-icon-btn svg,
-.tfa-action-icon svg {
-  display: block;
+.tfa-head-btn > svg,
+.tfa-time > svg {
+  stroke-width: 2.5;
 }
 .tfa-search-wrap {
   flex: 1;
@@ -553,40 +523,8 @@
   font-size: 13px;
   min-width: 0;
 }
-.header-help {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.tfa-icon-btn,
-.tfa-action-icon {
-  color: #8494ab;
-}
-.tfa-icon-btn:hover,
-.tfa-action-icon:hover {
-  color: #2f6df0;
-  background: #eef3fe;
-}
-.tfa-action-delete,
-.tfa-action-delete:hover {
-  color: #c2413a;
-}
-.tfa-action-delete:hover {
-  background: #fdf0ef;
-}
-.tfa-action-icon.is-saved:hover {
-  color: #2f6df0;
-  background: transparent;
-}
-
-/* 对齐参考：当前排序列蓝色、操作图标间距拉开、行首行钥匙 tile、动态码字距 */
 .tfa-head-btn.is-sorted {
-  color: #2f6df0;
-}
-.tfa-saved-actions,
-.tfa-recent-actions {
-  gap: 12px;
+  color: var(--blue);
 }
 .tfa-live-code {
   letter-spacing: 1.5px;

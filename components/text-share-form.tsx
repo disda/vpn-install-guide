@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { ArrowUpRight, Check, X } from "lucide-react";
 import {
   MAX_TEXT_BYTES,
   validateText,
@@ -149,9 +150,12 @@ export function TextShareForm() {
           >
             {validation
               ? validation.ok
-                ? format === "json"
-                  ? "✓ JSON 格式正确"
-                  : "✓ 文本检查通过"
+                ? (
+                    <>
+                      <Check size={14} aria-hidden="true" />
+                      {format === "json" ? "JSON 格式正确" : "文本检查通过"}
+                    </>
+                  )
                 : validation.error
               : format === "json"
                 ? "粘贴后自动校验 JSON"
@@ -175,7 +179,7 @@ export function TextShareForm() {
           disabled={pending || !validation?.ok}
         >
           {pending ? "正在保存…" : "生成分享链接"}
-          <span aria-hidden="true">↗</span>
+          <ArrowUpRight size={16} aria-hidden="true" />
         </button>
         <p className="text-under-button">
           只发送链接即可。持有链接的人可查看、复制或删除这份文本。
@@ -187,7 +191,7 @@ export function TextShareForm() {
         aria-labelledby="share-dialog-title"
       >
         <div className="text-dialog-check" aria-hidden="true">
-          ✓
+          <Check size={22} />
         </div>
         <h2 id="share-dialog-title">分享链接已生成</h2>
         <p>把下面的链接发给对方，就能查看完整文本。</p>
@@ -225,7 +229,7 @@ export function TextShareForm() {
           aria-label="关闭弹窗"
           onClick={() => dialog.current?.close()}
         >
-          ×
+          <X size={18} aria-hidden="true" />
         </button>
       </dialog>
     </>

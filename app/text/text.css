@@ -237,7 +237,6 @@
   border-radius: 50%;
   background: #e7f6ee;
   color: #25815b;
-  font-size: 23px;
   margin-bottom: 17px;
 }
 .text-share-dialog h2 {
@@ -304,8 +303,9 @@
   border: 0;
   background: transparent;
   color: #8290a7;
-  font-size: 27px;
-  line-height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
   cursor: pointer;
   width: 36px;
   height: 36px;
@@ -344,6 +344,12 @@
   font-size: 13px;
   color: var(--blue);
 }
+.text-new-share > a,
+.text-editor-status > .text-status-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
 .text-empty {
   min-height: 65vh;
   display: flex;
@@ -363,11 +369,6 @@
 }
 .text-empty .text-dialog-check {
   margin-bottom: 0;
-}
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 22px;
 }
 @media (max-width: 750px) {
   .text-workspace {
@@ -446,9 +447,6 @@
   }
   .text-viewer textarea {
     min-height: 350px;
-  }
-  .header-actions {
-    gap: 14px;
   }
 }
 .text-email-banner {

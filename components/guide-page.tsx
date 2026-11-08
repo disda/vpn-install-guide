@@ -1,51 +1,35 @@
 "use client";
-import { ArrowUpRight } from "lucide-react";
 
 import { useState, type KeyboardEvent } from "react";
 import Link from "next/link";
+import {
+  ArrowDownToLine,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  Grid2X2,
+  Monitor,
+  Plus,
+  Rocket,
+  Smartphone,
+} from "lucide-react";
 import { getGuide, guides, type Platform } from "@/lib/catalog";
 import type { Downloads } from "@/lib/release-source";
 
 function PlatformIcon({ platform }: { platform: Platform }) {
   if (platform === "windows")
-    return (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="m3 5 8-1v8H3V5Zm10-1 8-1v9h-8V4ZM3 14h8v7l-8-1v-6Zm10 0h8v9l-8-1v-8Z" />
-      </svg>
-    );
+    return <Grid2X2 aria-hidden="true" />;
   if (platform === "macos")
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        aria-hidden="true"
-      >
-        <rect x="3" y="3" width="18" height="13" rx="2" />
-        <path d="M8 21h8m-4-5v5M3 12h18" />
-      </svg>
-    );
+    return <Monitor aria-hidden="true" />;
   if (platform === "ios")
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        aria-hidden="true"
-      >
-        <rect x="6" y="2" width="12" height="20" rx="3" />
-        <path d="M10 5h4m-3 14h2" />
-      </svg>
-    );
+    return <Smartphone aria-hidden="true" />;
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.6"
       strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
       <path d="m7 3 2 3m8-3-2 3M5 12a7 7 0 0 1 14 0v6H5v-6Zm-2 0v5m18-5v5M8 18v3m8-3v3" />
@@ -114,25 +98,25 @@ export function GuidePage({
       <a className="skip-link" href="#main">
         跳到安装指南
       </a>
-      <header className="site-header">
+      <header className="site-header guide-header">
         <div className="header-inner">
           <Link className="brand" href="/" aria-label="连接指南首页">
-            <span className="brand-mark"><ArrowUpRight size={16} /></span>连接指南
+            <span className="brand-mark"><ArrowUpRight size={18} aria-hidden="true" /></span>连接指南
             <span className="brand-divider" />
             <span className="brand-caption">SETUP GUIDE</span>
           </Link>
           <div className="header-actions">
             <Link className="header-help" href="/2fa">
-              2FA 验证 <ArrowUpRight size={16} />
+              2FA 验证 <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
             <Link className="header-help" href="/text">
-              长文本分享 <ArrowUpRight size={16} />
+              长文本分享 <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
             <Link className="header-help" href="/codex-reset">
-              Codex 重置 <ArrowUpRight size={16} />
+              Codex 重置 <ArrowUpRight size={14} aria-hidden="true" />
             </Link>
             <a className="header-help" href="#faq">
-              遇到问题？<ArrowUpRight size={16} />
+              遇到问题？<ArrowUpRight size={14} aria-hidden="true" />
             </a>
           </div>
         </div>
@@ -152,11 +136,11 @@ export function GuidePage({
             <span>
               <b>01</b> 下载客户端
             </span>
-            <i>→</i>
+            <ArrowRight size={14} aria-hidden="true" />
             <span>
               <b>02</b> 导入订阅
             </span>
-            <i>→</i>
+            <ArrowRight size={14} aria-hidden="true" />
             <span>
               <b>03</b> 开始连接
             </span>
@@ -185,7 +169,7 @@ export function GuidePage({
                 <small>{item.client}</small>
               </span>
               <span className="tab-check" aria-hidden="true">
-                {platform === item.id ? "✓" : ""}
+                {platform === item.id && <Check size={14} />}
               </span>
             </button>
           ))}
@@ -204,7 +188,7 @@ export function GuidePage({
                 className={`client-icon ${platform === "ios" ? "rocket" : ""}`}
                 aria-hidden="true"
               >
-                {platform === "ios" ? "↗" : platform === "android" ? "C" : "F"}
+                {platform === "ios" ? <Rocket size={24} /> : platform === "android" ? "C" : "F"}
               </div>
               <div>
                 <div className="client-title">
@@ -242,7 +226,11 @@ export function GuidePage({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <span aria-hidden="true">{platform === "ios" ? "↗" : "↓"}</span>
+                {platform === "ios" ? (
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                ) : (
+                  <ArrowDownToLine size={16} aria-hidden="true" />
+                )}
                 {platform === "ios" ? "前往 App Store" : `下载 ${guide.client}`}
                 <span className="button-platform">
                   {platform === "ios"
@@ -274,7 +262,8 @@ export function GuidePage({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {platform === "ios" ? "查看应用详情" : "查看官方发布页"} ↗
+                {platform === "ios" ? "查看应用详情" : "查看官方发布页"}
+                <ArrowUpRight size={14} aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -328,14 +317,14 @@ export function GuidePage({
             <details key={faq.title}>
               <summary>
                 {faq.title}
-                <span aria-hidden="true">+</span>
+                <Plus size={16} aria-hidden="true" />
               </summary>
               <p>{faq.description}</p>
             </details>
           ))}
         </section>
         <div className="finish-note">
-          <span aria-hidden="true">✓</span>
+          <Check size={16} aria-hidden="true" />
           <p>设置完成后，下次打开客户端即可连接。</p>
         </div>
       </main>

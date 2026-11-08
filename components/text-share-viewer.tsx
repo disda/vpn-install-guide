@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import Link from "next/link";
+import { ArrowUpRight, Check } from "lucide-react";
 import type { TextShare } from "@/lib/text-shares";
 import { extractSharedEmail } from "@/lib/text-share-insights";
 import {
@@ -143,7 +144,7 @@ export function TextShareViewer({ share }: { share: TextShare }) {
   if (deleted)
     return (
       <section className="text-empty">
-        <div className="text-dialog-check">✓</div>
+        <div className="text-dialog-check" aria-hidden="true"><Check size={22} /></div>
         <h1>这份文本已删除</h1>
         <p>原链接已无法读取。</p>
         <Link className="primary-button" href="/text">
@@ -232,7 +233,7 @@ export function TextShareViewer({ share }: { share: TextShare }) {
         />
       </section>
       <p className="text-new-share">
-        <Link href="/text">我也要分享一段文本 ↗</Link>
+        <Link href="/text">我也要分享一段文本 <ArrowUpRight size={14} aria-hidden="true" /></Link>
       </p>
     </>
   );
