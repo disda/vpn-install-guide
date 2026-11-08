@@ -725,6 +725,9 @@ export function TwoFaTool() {
                         </span>
                       ) : (
                         <>
+                          <span className="tfa-key-tile">
+                            <KeyRound size={16} />
+                          </span>
                           {item.name}
                           <button
                             type="button"
