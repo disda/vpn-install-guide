@@ -515,3 +515,46 @@
   color: #1d2b43;
   word-break: break-all;
 }
+
+/* 精致化：文本页按钮统一改小，避免大按钮占据过多空间（不影响安装指南页） */
+.text-editor .primary-button,
+.text-share-dialog .primary-button {
+  min-height: 36px;
+  padding: 0 14px;
+  gap: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.text-editor .primary-button > span:first-child {
+  font-size: 15px;
+}
+.text-secondary-button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.text-submit {
+  min-height: 40px;
+}
+.text-delete-button {
+  padding: 6px 8px;
+}
+.text-view-actions {
+  gap: 8px;
+}
+.text-view-message {
+  margin: 12px 0 14px;
+}
+.text-note-row input {
+  padding: 7px 10px;
+}
+@media (max-width: 600px) {
+  .text-view-actions > .primary-button {
+    width: auto;
+    min-height: 38px;
+  }
+  .text-secondary-button {
+    min-height: 38px;
+  }
+}
