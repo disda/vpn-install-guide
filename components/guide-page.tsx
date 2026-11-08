@@ -117,19 +117,19 @@ export function GuidePage({
       <header className="site-header">
         <div className="header-inner">
           <Link className="brand" href="/" aria-label="连接指南首页">
-            <span className="brand-mark"><IconArrowUpRight size={19} /></span>连接指南
+            <span className="brand-mark"><IconArrowUpRight size={16} /></span>连接指南
             <span className="brand-divider" />
             <span className="brand-caption">SETUP GUIDE</span>
           </Link>
           <div className="header-actions">
             <Link className="header-help" href="/2fa">
-              2FA 验证 <IconArrowUpRight size={12} />
+              2FA 验证 <IconArrowUpRight size={16} />
             </Link>
             <Link className="header-help" href="/text">
-              长文本分享 <IconArrowUpRight size={12} />
+              长文本分享 <IconArrowUpRight size={16} />
             </Link>
             <a className="header-help" href="#faq">
-              遇到问题？<IconArrowUpRight size={12} />
+              遇到问题？<IconArrowUpRight size={16} />
             </a>
           </div>
         </div>
