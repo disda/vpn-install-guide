@@ -346,7 +346,14 @@ const USAGE_URL = "https://chatgpt.com/backend-api/wham/usage";
 export type UpstreamFetch = (
   url: string,
   init: { headers: Record<string, string>; signal?: AbortSignal },
-) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
+) => Promise<{
+  ok: boolean;
+  status: number;
+  json(): Promise<unknown>;
+  text?: () => Promise<string>;
+}>;
+
+
 
 export type QueryResult = {
   subscription: SubscriptionInfo | null;
@@ -359,7 +366,7 @@ function upstreamError(status: number): string {
   if (status === 401)
     return "登录凭证已失效或已过期（上游返回 401）。请重新登录 ChatGPT 后再获取一次 Session。";
   if (status === 403)
-    return "ChatGPT 拒绝了本站服务器的请求（403）。实测同一凭证从普通网络可以正常查询，这是服务器出口被上游拦截、不是凭证过期。请改用下方「浏览器内查询」。";
+    return "ChatGPT 拦截了本站服务器的请求（403）：它的防护层按来源网络拦截 Cloudflare 服务器，与凭证是否有效无关，本站暂时无法代查。套餐到期可先在 ChatGPT「设置 → 订阅」里查看。";
   if (status === 429) return "查询太频繁，上游限流了（429），请过一会儿再试。";
   return `上游接口返回错误 ${status}，请稍后重试。`;
 }
@@ -379,17 +386,29 @@ export async function queryChatGptAccount(options: {
         signal: init.signal ?? AbortSignal.timeout(15000),
         cache: "no-store",
       });
+      let bodyPromise: Promise<string> | null = null;
+      const bodyText = () => (bodyPromise ??= response.text());
       return {
         ok: response.ok,
         status: response.status,
-        json: async () => (await response.json()) as unknown,
+        json: async () => JSON.parse(await bodyText()) as unknown,
+        text: bodyText,
       };
     });
   const webHeaders = (path: string): Record<string, string> => ({
     Authorization: `Bearer ${options.accessToken}`,
-    Accept: "application/json",
+    Accept: "application/json, text/plain, */*",
+    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
     Referer: "https://chatgpt.com/",
     "User-Agent": WEB_UA,
+    "sec-ch-ua":
+      '"Chromium";v="147", "Google Chrome";v="147", "Not/A)Brand";v="99"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"macOS"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    priority: "u=1, i",
     "x-openai-target-path": path,
     "x-openai-target-route": path,
   });
@@ -463,80 +482,3 @@ export async function queryChatGptAccount(options: {
   return { subscription, subscriptionError, usage, usageError };
 }
 
-// ---------- 浏览器内查询：结果包解析 ----------
-
-export type BundleSession = {
-  email: string | null;
-  accountId: string | null;
-  planType: string | null;
-  sessionExpires: string | null;
-  tokenExpiresAt: number | null;
-};
-
-export type BundleParse =
-  | {
-      ok: true;
-      session: BundleSession;
-      subscription: SubscriptionInfo | null;
-      subscriptionError: string | null;
-      usage: UsageInfo | null;
-      usageError: string | null;
-    }
-  | { ok: false; error: string };
-
-export function parseResultBundle(text: string): BundleParse {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch {
-    return {
-      ok: false,
-      error: "这不是书签脚本复制的结果 JSON。请在 chatgpt.com 页面点一次查询书签，再把复制到的完整结果粘贴进来。",
-    };
-  }
-  const root = asRecord(parsed);
-  if (!root || (root.kind !== "chatgpt-check-result-v1" && !root.accountCheck && !root.usage)) {
-    return {
-      ok: false,
-      error: "没有识别到查询结果包。请粘贴书签脚本复制的完整结果，不要粘贴 Session。",
-    };
-  }
-  const rawSession = asRecord(root.session);
-  const session: BundleSession = {
-    email: firstStr(rawSession, ["email"]),
-    accountId: firstStr(rawSession, ["accountId", "account_id"]),
-    planType: firstStr(rawSession, ["planType", "plan_type"]),
-    sessionExpires: firstStr(rawSession, ["expires"]),
-    tokenExpiresAt:
-      typeof rawSession?.tokenExpiresAt === "number"
-        ? rawSession.tokenExpiresAt
-        : null,
-  };
-  let subscription = root.accountCheck
-    ? parseAccountCheck(root.accountCheck, session.accountId)
-    : null;
-  let subscriptionError: string | null = subscription
-    ? null
-    : "结果包里没有可用的订阅信息。";
-  if (root.subscriptions) {
-    const extra = parseSubscriptions(root.subscriptions, session.accountId);
-    if (extra) {
-      subscription = {
-        accountId: subscription?.accountId ?? extra.accountId,
-        planType: subscription?.planType ?? extra.planType,
-        activeUntil: subscription?.activeUntil ?? extra.activeUntil,
-      };
-      if (subscription.activeUntil || subscription.planType)
-        subscriptionError = null;
-    }
-  }
-  const usage = root.usage ? parseUsage(root.usage) : null;
-  return {
-    ok: true,
-    session,
-    subscription,
-    subscriptionError,
-    usage,
-    usageError: usage ? null : "结果包里没有可用的额度信息。",
-  };
-}
