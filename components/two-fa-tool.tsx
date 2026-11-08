@@ -19,8 +19,11 @@ import {
   EMPTY_TWO_FA_STORE,
   parseTwoFaStore,
   pushRecent,
+  recentDisplayLabels,
+  savedNameFor,
   TWO_FA_STORE_KEY,
   upsertSaved,
+  type RecentEntry,
   type TwoFaStoreData,
 } from "@/lib/two-fa-storage";
 
@@ -156,9 +159,7 @@ export function TwoFaTool() {
       recent: pushRecent(current.recent, {
         id: newId(),
         secrets: found.map((entry) => entry.secret),
-        labels: found.map(
-          (entry) => entry.label || maskSecret(entry.secret),
-        ),
+        labels: found.map((entry) => entry.label || entry.secret),
         at: currentTimeMs(),
       }),
     });
@@ -196,9 +197,9 @@ export function TwoFaTool() {
       ...current,
       saved: upsertSaved(current.saved, {
         id: newId(),
-        name: entry.label || maskSecret(entry.secret),
+        name: savedNameFor(entry.label, entry.secret),
         secret: entry.secret,
-        createdAt: Date.now(),
+        createdAt: currentTimeMs(),
       }),
     });
   }
@@ -222,6 +223,20 @@ export function TwoFaTool() {
       ),
     });
     setEditingId("");
+  }
+
+  function saveRecent(item: RecentEntry) {
+    const current = getSnapshot();
+    let saved = current.saved;
+    item.secrets.forEach((secret, index) => {
+      saved = upsertSaved(saved, {
+        id: newId(),
+        name: savedNameFor(item.labels[index] ?? "", secret),
+        secret,
+        createdAt: currentTimeMs(),
+      });
+    });
+    writeStore({ ...current, saved });
   }
 
   function removeRecent(id: string) {
@@ -387,7 +402,7 @@ export function TwoFaTool() {
           {store.recent.map((item) => (
             <div className="tfa-store-row" key={item.id}>
               <span className="tfa-store-name">
-                {item.labels.join("、")}
+                {recentDisplayLabels(item).join("、")}
                 {item.secrets.length > 1
                   ? `（共 ${item.secrets.length} 个）`
                   : ""}
@@ -399,6 +414,17 @@ export function TwoFaTool() {
                   onClick={() => loadAndScroll(item.secrets.join("\n"))}
                 >
                   载入
+                </button>
+                <button
+                  type="button"
+                  disabled={item.secrets.every((secret) =>
+                    savedSecrets.has(secret),
+                  )}
+                  onClick={() => saveRecent(item)}
+                >
+                  {item.secrets.every((secret) => savedSecrets.has(secret))
+                    ? "已保存"
+                    : "保存到列表"}
                 </button>
                 <button type="button" onClick={() => removeRecent(item.id)}>
                   删除

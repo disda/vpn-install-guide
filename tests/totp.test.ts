@@ -140,3 +140,25 @@ test("工具页条目：完整格式带出邮箱标签，裸密钥无标签", ()
   assert.equal(entries[0].label, "a@b.com");
   assert.equal(entries[1].label, "");
 });
+
+test("近期标签全量显示：旧脱敏标签回退完整密钥；保存命名规则", async () => {
+  const { recentDisplayLabels, savedNameFor } = await import(
+    "../lib/two-fa-storage"
+  );
+  const legacy: RecentEntry = {
+    id: "x",
+    secrets: ["FIFXBP7OT56R5CRXICZ365HERMYJEWTU", "GEZDGNBVGY3TQOJQ"],
+    labels: ["FIFX…EWTU", "a@b.com"],
+    at: 1,
+  };
+  assert.deepEqual(recentDisplayLabels(legacy), [
+    "FIFXBP7OT56R5CRXICZ365HERMYJEWTU",
+    "a@b.com",
+  ]);
+  assert.equal(savedNameFor("a@b.com", "GEZDGNBVGY3TQOJQ"), "a@b.com");
+  assert.equal(savedNameFor("", "JBSWY3DPEHPK3PXP"), "JBSW…3PXP");
+  assert.equal(
+    savedNameFor("JBSWY3DPEHPK3PXP", "JBSWY3DPEHPK3PXP"),
+    "JBSW…3PXP",
+  );
+});

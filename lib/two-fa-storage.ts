@@ -1,6 +1,8 @@
 // 2FA 工具页的本地存储（localStorage）：已保存条目 + 近期查询。
 // 只存密钥本身与名称/标签，不存完整格式里的密码等字段；数据不出本机浏览器。
 
+import { maskSecret } from "./totp";
+
 export interface SavedEntry {
   id: string;
   name: string;
@@ -79,4 +81,25 @@ export function upsertSaved(
 ): SavedEntry[] {
   if (list.some((item) => item.secret === entry.secret)) return list;
   return [entry, ...list].slice(0, MAX_SAVED);
+}
+
+/** 真标签：有值、不是密钥本身、也不是脱敏串（如 JBSW…3PXP）。 */
+export function isRealLabel(label: string, secret: string): boolean {
+  return label !== "" && label !== secret && !label.includes("…");
+}
+
+/**
+ * 近期查询的展示标签（用户要求不缩略，完整显示）：
+ * 有真标签用标签，否则直接用完整密钥；旧数据里的脱敏标签同样回退到完整密钥。
+ */
+export function recentDisplayLabels(item: RecentEntry): string[] {
+  return item.secrets.map((secret, index) => {
+    const label = item.labels[index] ?? "";
+    return isRealLabel(label, secret) ? label : secret;
+  });
+}
+
+/** 保存到列表时的命名：有真标签用标签，否则用脱敏密钥。 */
+export function savedNameFor(label: string, secret: string): string {
+  return isRealLabel(label, secret) ? label : maskSecret(secret);
 }

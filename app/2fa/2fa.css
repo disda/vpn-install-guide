@@ -204,9 +204,9 @@
   min-width: 0;
   font-size: 13px;
   color: #1d2b43;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 1.6;
 }
 .tfa-store-secret {
   font-family: ui-monospace, monospace;
@@ -244,4 +244,11 @@
   border-radius: 7px;
   padding: 0 8px;
   font-size: 13px;
+}
+
+.tfa-store-actions button:disabled {
+  color: #15916c;
+  border-color: #bfe6d8;
+  background: #effaf5;
+  cursor: default;
 }
